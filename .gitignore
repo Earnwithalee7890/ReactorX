@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+artifacts/
+cache/
+dist/
+deployment.json
+frontend/.next/
+frontend/node_modules/

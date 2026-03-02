@@ -1,0 +1,89 @@
+import { parseAbi } from "viem";
+
+// Contract ABIs for ReactorX
+export const LENDING_MOCK_ABI = parseAbi([
+    // Events
+    "event PositionUpdated(address indexed user, uint256 collateral, uint256 debt, uint256 healthFactor, uint256 timestamp)",
+    "event PriceUpdated(uint256 oldPrice, uint256 newPrice, uint256 timestamp)",
+    "event PositionLiquidated(address indexed user, uint256 collateralSeized, uint256 debtCleared, uint256 timestamp)",
+    "event CollateralDeposited(address indexed user, uint256 amount, uint256 timestamp)",
+    "event AssetBorrowed(address indexed user, uint256 amount, uint256 timestamp)",
+    // View functions
+    "function getHealthFactor(address user) view returns (uint256)",
+    "function getPosition(address user) view returns (uint256 collateral, uint256 debt, bool isActive)",
+    "function isLiquidatable(address user) view returns (bool)",
+    "function collateralPrice() view returns (uint256)",
+    "function liquidationThreshold() view returns (uint256)",
+    "function getAllPositionHolders() view returns (address[])",
+    "function reactorEngine() view returns (address)",
+    // Write functions
+    "function depositCollateral(uint256 amount)",
+    "function borrow(uint256 amount)",
+    "function updatePrice(uint256 newPrice)",
+    "function setReactorEngine(address engine)",
+]);
+
+export const REACTOR_ENGINE_ABI = parseAbi([
+    // Events
+    "event ReactionTriggered(address indexed user, uint256 healthFactor, bool liquidationExecuted, uint256 timestamp)",
+    "event SubscriptionCreated(uint64 subscriptionId, string eventType)",
+    // View functions
+    "function totalReactions() view returns (uint256)",
+    "function totalLiquidationsTriggered() view returns (uint256)",
+    "function isSubscribed() view returns (bool)",
+    "function positionSubscriptionId() view returns (uint64)",
+    "function getStats() view returns (uint256 reactions, uint256 liquidations, bool subscribed, uint64 subId)",
+    "function POSITION_UPDATED_TOPIC() view returns (bytes32)",
+    "function SOMNIA_REACTIVITY_PRECOMPILE() view returns (address)",
+    "function owner() view returns (address)",
+    // Write
+    "function registerSubscription(address lendingMockAddress)",
+    "function removeSubscription()",
+    "function manualReact(address user)",
+    "function handleReactiveEvent(address emitter, bytes32[] calldata eventTopics, bytes calldata data)",
+    "function configure(address lendingMock, address liquidationManager)",
+]);
+
+export const LIQUIDATION_MANAGER_ABI = parseAbi([
+    // Events
+    "event Liquidated(address indexed user, uint256 collateralSeized, uint256 debtCleared, uint256 reward, address indexed executor, uint256 timestamp)",
+    // View
+    "function totalLiquidations() view returns (uint256)",
+    "function totalCollateralSeized() view returns (uint256)",
+    "function getLiquidationCount() view returns (uint256)",
+    "struct LiquidationRecord { address user; uint256 collateralSeized; uint256 debtCleared; uint256 reward; uint256 timestamp; address executor; }",
+    "function getLiquidationHistory() view returns (LiquidationRecord[])",
+    "function getLatestLiquidation() view returns (LiquidationRecord)",
+    "function isPositionLiquidatable(address user) view returns (bool)",
+    "function LIQUIDATION_REWARD_BPS() view returns (uint256)",
+    "function rewardsEarned(address) view returns (uint256)",
+    // Write
+    "function executeLiquidation(address user) returns (bool)",
+    "function setReactorEngine(address engine)",
+]);
+
+export const CONTRACT_ADDRESSES = {
+    lendingMock: process.env.NEXT_PUBLIC_LENDING_MOCK_ADDRESS as `0x${string}`,
+    reactorEngine: process.env.NEXT_PUBLIC_REACTOR_ENGINE_ADDRESS as `0x${string}`,
+    liquidationManager: process.env.NEXT_PUBLIC_LIQUIDATION_MANAGER_ADDRESS as `0x${string}`,
+};
+
+export const SOMNIA_TESTNET = {
+    id: 50312,
+    name: "Somnia Testnet",
+    network: "somnia-testnet",
+    nativeCurrency: { name: "Somnia Test Token", symbol: "STT", decimals: 18 },
+    rpcUrls: {
+        default: {
+            http: ["https://dream-rpc.somnia.network"],
+            webSocket: ["wss://api.infra.testnet.somnia.network/ws"],
+        },
+        public: {
+            http: ["https://dream-rpc.somnia.network"],
+            webSocket: ["wss://api.infra.testnet.somnia.network/ws"],
+        },
+    },
+    blockExplorers: {
+        default: { name: "Somnia Explorer", url: "https://shannon-explorer.somnia.network" },
+    },
+} as const;
