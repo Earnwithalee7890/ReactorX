@@ -52,13 +52,11 @@ export default function StatsRow({ stats }: Props) {
         <div
             style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4,1fr)",
                 gap: 16,
                 maxWidth: 1400,
                 margin: "28px auto 0",
-                padding: "0 32px",
             }}
-            className="grid-4-col"
+            className="grid-4-col page-pad"
         >
             {items.map((item) => (
                 <div

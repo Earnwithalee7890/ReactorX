@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function HeroSection() {
     return (
-        <section style={{ padding: "60px 32px 0", position: "relative" }}>
+        <section className="page-pad" style={{ paddingTop: 60, position: "relative" }}>
             {/* Hero background image */}
             <div style={{
                 position: "absolute", inset: 0, zIndex: 0, overflow: "hidden",

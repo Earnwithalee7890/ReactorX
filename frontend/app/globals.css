@@ -808,6 +808,12 @@ body {
   border: 1px solid rgba(59, 27, 11, 0.6);
   border-radius: 12px;
   width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tab-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -1001,6 +1007,28 @@ body {
   }
 }
 
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-pad {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.grid-2-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.grid-3-col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.grid-4-col {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 @media (max-width: 640px) {
   .grid-4-col {
     grid-template-columns: 1fr !important;
@@ -1008,5 +1036,36 @@ body {
 
   .grid-3-col {
     grid-template-columns: 1fr !important;
+  }
+
+  /* Force padding reduction on mobile */
+  header,
+  section,
+  main,
+  footer,
+  .grid-4-col {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Fix HeroSection Headline Size */
+  .hero-glow-text {
+    font-size: clamp(2rem, 8vw, 2.5rem) !important;
+  }
+
+  /* Make tab nav buttons smaller on mobile so they fit */
+  .tab-btn {
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+  }
+
+  /* Make header address pill smaller */
+  nav>div>span:last-child {
+    font-size: 10px !important;
+  }
+
+  .page-pad {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 }

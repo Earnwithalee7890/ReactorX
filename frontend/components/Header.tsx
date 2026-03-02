@@ -17,7 +17,7 @@ export default function Header() {
             className="header-blur"
             style={{
                 position: "sticky", top: 0, zIndex: 200,
-                padding: "0 32px", height: 68,
+                padding: "0 16px", height: 68,
                 display: "flex", alignItems: "center", justifyContent: "space-between",
             }}
         >
@@ -64,7 +64,7 @@ export default function Header() {
                         fontSize: 10, color: "var(--text-muted)",
                         letterSpacing: "0.12em", textTransform: "uppercase",
                         marginTop: 2,
-                    }}>
+                    }} className="hide-mobile">
                         Autonomous Liquidation Engine
                     </div>
                 </div>
@@ -76,7 +76,7 @@ export default function Header() {
                 <a
                     href="https://testnet.somnia.network"
                     target="_blank" rel="noopener noreferrer"
-                    className="btn-secondary"
+                    className="btn-secondary hide-mobile"
                     style={{ padding: "8px 16px", fontSize: 12, textDecoration: "none" }}
                     title="Get Free Testnet STT"
                 >
@@ -84,7 +84,7 @@ export default function Header() {
                 </a>
 
                 {/* Live badge */}
-                <span className="badge badge-cyan" style={{ fontSize: 11 }}>
+                <span className="badge badge-cyan hide-mobile" style={{ fontSize: 11 }}>
                     <span className="dot-pulse cyan" />
                     Reactivity Live
                 </span>

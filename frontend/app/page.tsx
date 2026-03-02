@@ -45,7 +45,7 @@ export default function Home() {
         <StatsRow stats={stats} />
 
         {/* ── Tabs ── */}
-        <div style={{ padding: "28px 32px 0", maxWidth: 1400, margin: "0 auto" }}>
+        <div className="page-pad" style={{ paddingTop: "28px", maxWidth: 1400, margin: "0 auto" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
             <div className="tab-nav">
               {([
@@ -87,7 +87,7 @@ export default function Home() {
 
         {/* ── Error banner ── */}
         {error && (
-          <div style={{ padding: "12px 32px", maxWidth: 1400, margin: "0 auto" }}>
+          <div className="page-pad" style={{ padding: "12px 0", maxWidth: 1400, margin: "0 auto" }}>
             <div style={{
               background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.3)",
               borderRadius: 12, padding: "12px 18px", color: "#f87171", fontSize: 13,
@@ -99,7 +99,7 @@ export default function Home() {
         )}
 
         {/* ── Main content ── */}
-        <main style={{ padding: "20px 32px 80px", maxWidth: 1400, margin: "0 auto" }}>
+        <main className="page-pad" style={{ padding: "20px 0 80px", maxWidth: 1400, margin: "0 auto" }}>
 
           {/* DASHBOARD TAB */}
           {tab === "dashboard" && (
@@ -164,9 +164,9 @@ export default function Home() {
         </main>
 
         {/* ── Extravagant Footer ── */}
-        <footer style={{
+        <footer className="page-pad" style={{
           borderTop: "1px solid rgba(234,88,12,0.15)",
-          padding: "60px 32px 40px",
+          paddingTop: 60, paddingBottom: 40,
           background: "linear-gradient(180deg, transparent 0%, rgba(20,8,0,0.8) 100%)",
           backdropFilter: "blur(10px)",
           position: "relative"
