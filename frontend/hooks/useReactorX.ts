@@ -108,6 +108,17 @@ export function useReactorX() {
         if (typeof window === "undefined") return;
         if (!address) return;
 
+        // Collect distinct users locally for simple analytics/metrics
+        try {
+            const usersStr = localStorage.getItem("reactorx_collected_users") || "[]";
+            const users = JSON.parse(usersStr);
+            if (!users.includes(address.toLowerCase())) {
+                users.push(address.toLowerCase());
+                localStorage.setItem("reactorx_collected_users", JSON.stringify(users));
+                console.log("Analytics: Logged new connecting user ->", address);
+            }
+        } catch { /* ignore JSON errors */ }
+
         // Detect wallet switch — reset state
         if (prevAddressRef.current && prevAddressRef.current !== address) {
             setPosition(null);

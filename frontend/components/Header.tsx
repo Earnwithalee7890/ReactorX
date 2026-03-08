@@ -200,6 +200,7 @@ export default function Header() {
     const { switchChain, isPending: isSwitching } = useSwitchChain();
     const [showModal, setShowModal] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [hasPrompted, setHasPrompted] = useState(false);
 
     const wrongNetwork = isConnected && chainId !== SOMNIA_TESTNET.id;
 
@@ -238,6 +239,15 @@ export default function Header() {
             }
         }
     };
+
+    // Auto-prompt to switch network if wrong network upon connect
+    useEffect(() => {
+        if (isConnected && wrongNetwork && !hasPrompted) {
+            setHasPrompted(true);
+            handleSwitchNetwork();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isConnected, wrongNetwork, hasPrompted]);
 
     return (
         <>

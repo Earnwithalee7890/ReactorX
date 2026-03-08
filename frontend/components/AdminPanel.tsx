@@ -100,27 +100,21 @@ export default function AdminPanel({ stats, txLoading, address, onUpdatePrice, o
             </div>
 
             {/* Subscription control */}
-            <div style={{
-                borderTop: "1px solid rgba(59,27,11,0.8)",
-                paddingTop: 20,
-                display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12,
-            }}>
-                <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4 }}>
-                        Somnia Reactivity Subscription
+            {!stats?.isSubscribed && (
+                <div style={{
+                    borderTop: "1px solid rgba(59,27,11,0.8)",
+                    paddingTop: 20,
+                    display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12,
+                }}>
+                    <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4 }}>
+                            Somnia Reactivity Subscription
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                            Not registered. Calls Precompile 0x0100 to subscribe.
+                        </div>
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                        {stats?.isSubscribed
-                            ? `Active — Subscription ID: ${stats.subscriptionId}`
-                            : "Not registered. Calls Precompile 0x0100 to subscribe."}
-                    </div>
-                </div>
 
-                {stats?.isSubscribed ? (
-                    <span className="badge badge-green">
-                        <span className="dot-pulse green" /> Active
-                    </span>
-                ) : (
                     <button
                         id="register-subscription-btn"
                         className="btn-primary"
@@ -130,8 +124,8 @@ export default function AdminPanel({ stats, txLoading, address, onUpdatePrice, o
                     >
                         {txLoading ? <span className="spinner" /> : "🔔 Register"}
                     </button>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
