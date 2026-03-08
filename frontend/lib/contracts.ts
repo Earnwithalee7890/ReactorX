@@ -7,7 +7,8 @@ export const LENDING_MOCK_ABI = parseAbi([
     "event PriceUpdated(uint256 oldPrice, uint256 newPrice, uint256 timestamp)",
     "event PositionLiquidated(address indexed user, uint256 collateralSeized, uint256 debtCleared, uint256 timestamp)",
     "event CollateralDeposited(address indexed user, uint256 amount, uint256 timestamp)",
-    "event AssetBorrowed(address indexed user, uint256 amount, uint256 timestamp)",
+    "event AssetBorrowed(address indexed user, address token, uint256 amount, uint256 timestamp)",
+    "event AssetRepaid(address indexed user, address token, uint256 amount, uint256 timestamp)",
     // View functions
     "function getHealthFactor(address user) view returns (uint256)",
     "function getPosition(address user) view returns (uint256 collateral, uint256 debt, bool isActive)",
@@ -17,8 +18,9 @@ export const LENDING_MOCK_ABI = parseAbi([
     "function getAllPositionHolders() view returns (address[])",
     "function reactorEngine() view returns (address)",
     // Write functions
-    "function depositCollateral(uint256 amount)",
-    "function borrow(uint256 amount)",
+    "function depositCollateral() payable",
+    "function borrow(address token, uint256 amount)",
+    "function repay(address token, uint256 amount)",
     "function updatePrice(uint256 newPrice)",
     "function setReactorEngine(address engine)",
 ]);

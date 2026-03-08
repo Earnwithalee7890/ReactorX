@@ -115,18 +115,19 @@ contract LiquidationManager is ReentrancyGuard {
      * @return success Whether liquidation was executed
      */
     function executeLiquidation(address user) external onlyReactorOrOwner nonReentrant returns (bool success) {
-        require(!liquidated[user] || lendingMock.isLiquidatable(user), "LiquidationManager: not liquidatable");
+        require(lendingMock.isLiquidatable(user), "LiquidationManager: not liquidatable");
 
         uint256 hf = lendingMock.getHealthFactor(user);
         require(hf < MIN_HEALTH, "LiquidationManager: position healthy");
 
         // Execute the liquidation on lending contract
+        // LendingMock will transfer native STT to this contract
         (uint256 collateralSeized, uint256 debtCleared) = lendingMock.liquidatePosition(user);
 
         // Calculate liquidator reward (10% of seized collateral)
         uint256 reward = (collateralSeized * LIQUIDATION_REWARD_BPS) / BPS_DENOMINATOR;
 
-        // Record who executed (the reactor engine acts as liquidator in this model)
+        // Record who executed (the reactor engine or the human caller)
         address executor = msg.sender;
 
         // Save record
@@ -144,9 +145,17 @@ contract LiquidationManager is ReentrancyGuard {
         totalLiquidations++;
         totalCollateralSeized += collateralSeized;
 
+        // Send reward to executor
+        if (reward > 0) {
+            (bool sent, ) = payable(executor).call{value: reward}("");
+            require(sent, "LiquidationManager: failed to send reward");
+        }
+
         emit Liquidated(user, collateralSeized, debtCleared, reward, executor, block.timestamp);
         return true;
     }
+
+    receive() external payable {}
 
     // ========================================
     // VIEW FUNCTIONS

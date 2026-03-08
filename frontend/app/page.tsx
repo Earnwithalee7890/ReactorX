@@ -116,7 +116,7 @@ export default function Home() {
   const {
     position, allPositions, liquidationHistory, stats,
     loading, txLoading, error, recentEvents,
-    depositCollateral, borrow, updatePrice, manualReact,
+    depositCollateral, borrow, repay, updatePrice, manualReact,
     registerSubscription, refreshAll,
   } = useReactorX();
 
@@ -239,6 +239,7 @@ export default function Home() {
                     txLoading={txLoading}
                     onDeposit={depositCollateral}
                     onBorrow={borrow}
+                    onRepay={repay}
                   />
                   <AdminPanel
                     stats={stats}

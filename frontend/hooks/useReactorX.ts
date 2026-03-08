@@ -311,12 +311,12 @@ export function useReactorX() {
             const amountWei = parseEther(amount);
             if (amountWei <= 0n) throw new Error("Parsed amount must be strictly positive.");
 
-            addEvent(`⏳ Submitting deposit of ${amount} STT...`);
+            addEvent(`⏳ Submitting deposit of ${amount} STT collateral...`);
             const hash = await walletClient!.writeContract({
                 address: CONTRACT_ADDRESSES.lendingMock,
                 abi: LENDING_MOCK_ABI,
                 functionName: "depositCollateral",
-                args: [amountWei],
+                value: amountWei,
             });
             addEvent(`⬆️ Deposited ${amount} STT collateral | tx: ${hash.slice(0, 10)}...`);
             await publicClient?.waitForTransactionReceipt({ hash });
@@ -333,7 +333,7 @@ export function useReactorX() {
     }, [walletClient, address, publicClient, refreshAll, addEvent]);
 
     // ── Write: Borrow ──────────────────────────────────────────────────────
-    const borrow = useCallback(async (amount: string) => {
+    const borrow = useCallback(async (tokenAddr: string, amount: string, symbol: string) => {
         setTxLoading(true);
         setError(null);
         try {
@@ -343,19 +343,57 @@ export function useReactorX() {
             }
             requireWallet();
 
-            const amountWei = parseEther(amount);
-            if (amountWei <= 0n) throw new Error("Parsed amount must be strictly positive.");
+            const amountWei = parseEther(amount); // Simplified: assume 18 decimals for hackathon mocks
 
-            addEvent(`⏳ Submitting borrow of ${amount} USDC...`);
+            addEvent(`⏳ Submitting borrow of ${amount} ${symbol}...`);
             const hash = await walletClient!.writeContract({
                 address: CONTRACT_ADDRESSES.lendingMock,
                 abi: LENDING_MOCK_ABI,
                 functionName: "borrow",
-                args: [amountWei],
+                args: [tokenAddr as `0x${string}`, amountWei],
             });
-            addEvent(`💸 Borrowed ${amount} USDC | tx: ${hash.slice(0, 10)}...`);
+            addEvent(`💸 Borrowed ${amount} ${symbol} | tx: ${hash.slice(0, 10)}...`);
             await publicClient?.waitForTransactionReceipt({ hash });
-            addEvent(`✅ Borrow confirmed on-chain!`);
+            addEvent(`✅ Borrow confirmed! ${symbol} added to your wallet.`);
+            await refreshAll();
+            return hash;
+        } catch (e: any) {
+            const msg = parseContractError(e);
+            setError(msg);
+            throw new Error(msg);
+        } finally {
+            setTxLoading(false);
+        }
+    }, [walletClient, address, publicClient, refreshAll, addEvent]);
+
+    // ── Write: Repay ───────────────────────────────────────────────────────
+    const repay = useCallback(async (tokenAddr: string, amount: string, symbol: string) => {
+        setTxLoading(true);
+        setError(null);
+        try {
+            requireWallet();
+            const amountWei = parseEther(amount);
+
+            // Approve first
+            addEvent(`⏳ Approving ${symbol} for repayment...`);
+            const appHash = await walletClient!.writeContract({
+                address: tokenAddr as `0x${string}`,
+                abi: [parseAbi(["function approve(address,uint256)"])[0]],
+                functionName: "approve",
+                args: [CONTRACT_ADDRESSES.lendingMock, amountWei],
+            });
+            await publicClient?.waitForTransactionReceipt({ hash: appHash });
+
+            addEvent(`⏳ Submitting repayment of ${amount} ${symbol}...`);
+            const hash = await walletClient!.writeContract({
+                address: CONTRACT_ADDRESSES.lendingMock,
+                abi: LENDING_MOCK_ABI,
+                functionName: "repay",
+                args: [tokenAddr as `0x${string}`, amountWei],
+            });
+            addEvent(`� Repaid ${amount} ${symbol} | tx: ${hash.slice(0, 10)}...`);
+            await publicClient?.waitForTransactionReceipt({ hash });
+            addEvent(`✅ Repayment confirmed! Debt reduced.`);
             await refreshAll();
             return hash;
         } catch (e: any) {
@@ -569,12 +607,27 @@ export function useReactorX() {
             },
         });
 
+        const unwatch5 = publicClient.watchContractEvent({
+            address: CONTRACT_ADDRESSES.lendingMock,
+            abi: LENDING_MOCK_ABI,
+            eventName: "AssetRepaid",
+            onLogs: (logs) => {
+                logs.forEach((log: any) => {
+                    const args = log.args;
+                    addEvent(`💰 Repayment detected: ${args?.user?.slice(0, 8)}... amount=${parseFloat(formatEther(args?.amount || 0n)).toFixed(2)}`);
+                });
+                refreshAll();
+            },
+        });
+
         return () => {
             unwatch1?.();
             unwatch2?.();
             unwatch3?.();
             unwatch4?.();
+            unwatch5?.();
         };
+
     }, [publicClient, address, addEvent, fetchPosition, fetchAllPositions, fetchLiquidationHistory, fetchStats]);
 
     // ── Auto-refresh on load and interval ─────────────────────────────────
@@ -609,6 +662,7 @@ export function useReactorX() {
         recentEvents,
         depositCollateral,
         borrow,
+        repay,
         updatePrice,
         manualReact,
         registerSubscription,

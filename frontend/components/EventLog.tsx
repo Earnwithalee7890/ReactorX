@@ -29,14 +29,20 @@ export default function EventLog({ events }: Props) {
                         {" "}Listening for on-chain events via WebSocket…
                     </div>
                 ) : (
-                    events.map((event, i) => (
-                        <div key={i} className={`event-entry${i === 0 ? " latest" : ""}`}>
-                            <span style={{ color: i === 0 ? "#f97316" : "var(--text-muted)", marginRight: 10 }}>
-                                {now}
-                            </span>
-                            {event}
-                        </div>
-                    ))
+                    events.map((event, i) => {
+                        const isReactivity = event.toLowerCase().includes("reactivity") || event.toLowerCase().includes("dyn pushed");
+                        return (
+                            <div key={i} className={`event-entry${i === 0 ? " latest" : ""}${isReactivity ? " reactivity-push" : ""}`}>
+                                <span className="event-timestamp">
+                                    {now}
+                                </span>
+                                <div style={{ flex: 1 }}>
+                                    {isReactivity && <span className="reactivity-tag">Reactivity</span>}
+                                    {event}
+                                </div>
+                            </div>
+                        );
+                    })
                 )}
             </div>
         </div>
