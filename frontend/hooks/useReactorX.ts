@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { usePublicClient, useAccount, useWalletClient } from "wagmi";
 import { parseEther, formatEther } from "viem";
+import { SDK, SubscriptionCallback } from "@somnia-chain/reactivity";
 import {
     LENDING_MOCK_ABI,
     REACTOR_ENGINE_ABI,
@@ -98,6 +99,8 @@ export function useReactorX() {
 
     // Track previous address to detect wallet changes
     const prevAddressRef = useRef<string | undefined>(undefined);
+    // Somnia SDK Off-chain Reactivity Subscription Tracker
+    const reactivitySubRef = useRef<any>(null);
 
     const addEvent = useCallback((msg: string) => {
         setRecentEvents((prev) => [msg, ...prev].slice(0, 50));
@@ -122,9 +125,13 @@ export function useReactorX() {
         // Detect wallet switch — reset state
         if (prevAddressRef.current && prevAddressRef.current !== address) {
             setPosition(null);
+            setMockSubscribed(false);
             setMockReactions(0n);
             setMockLiquidations(0n);
-            setError(null);
+            if (reactivitySubRef.current) {
+                try { reactivitySubRef.current.unsubscribe(); } catch { }
+                reactivitySubRef.current = null;
+            }
             addEvent(`🔄 Wallet changed to ${address.slice(0, 8)}...`);
         }
         prevAddressRef.current = address;
@@ -381,26 +388,9 @@ export function useReactorX() {
                 functionName: "updatePrice",
                 args: [priceWei],
             });
-            addEvent(`📉 Price updated to $${price} | tx: ${hash.slice(0, 10)}... (ReactorEngine will react!)`);
+            addEvent(`📉 Price updated to $${price} | tx: ${hash.slice(0, 10)}...`);
             await publicClient?.waitForTransactionReceipt({ hash });
-            addEvent(`✅ Price update confirmed! ReactorEngine is analyzing positions...`);
-
-            // Trigger manual react if subscribed (handles Somnia testnet precompile fallback)
-            if ((mockSubscribed || stats?.isSubscribed) && address) {
-                walletClient!.writeContract({
-                    address: CONTRACT_ADDRESSES.reactorEngine,
-                    abi: REACTOR_ENGINE_ABI,
-                    functionName: "manualReact",
-                    args: [address as `0x${string}`],
-                }).then((reactHash) => {
-                    addEvent(`⚡ ReactorEngine automatically fired! | tx: ${reactHash.slice(0, 10)}...`);
-                    setMockReactions((r) => r + 1n);
-                    setMockLiquidations((l) => l + 1n);
-                }).catch((err) => {
-                    // Silent — expected on testnet if precompile not available
-                    console.warn("Auto-react failed (normal on testnet):", err?.message?.slice(0, 80));
-                });
-            }
+            addEvent(`✅ Price update confirmed! Waiting for Somnia Reactivity...`);
 
             await refreshAll();
             return hash;
@@ -440,54 +430,75 @@ export function useReactorX() {
         }
     }, [walletClient, address, publicClient, refreshAll, addEvent]);
 
-    // ── Write: Register Subscription ──────────────────────────────────────
+    // ── Write: Register Subscription (Off-Chain TypeScript SDK) ────────────
     const registerSubscription = useCallback(async () => {
         setTxLoading(true);
         setError(null);
         try {
             requireWallet();
-            addEvent(`⏳ Registering Somnia Reactivity subscription...`);
-
-            // The Somnia System Precompile (0x0100) is experimental on Testnet and may revert.
-            // We attempt the real TX, then gracefully fall back to mock mode.
-            let hash: `0x${string}` = `0x${"0".repeat(64)}` as `0x${string}`;
-            let realTxSucceeded = false;
-
-            try {
-                hash = await walletClient!.writeContract({
-                    address: CONTRACT_ADDRESSES.reactorEngine,
-                    abi: REACTOR_ENGINE_ABI,
-                    functionName: "registerSubscription",
-                    args: [CONTRACT_ADDRESSES.lendingMock],
-                    gas: BigInt(500000),
-                });
-                await publicClient?.waitForTransactionReceipt({ hash });
-                realTxSucceeded = true;
-                addEvent(`🔔 Somnia Reactivity subscription registered on-chain! | tx: ${hash.slice(0, 10)}...`);
-            } catch (err: any) {
-                // Expected: testnet precompile may revert — enable mock mode
-                const isPrecompileRevert =
-                    err?.message?.toLowerCase().includes("revert") ||
-                    err?.message?.toLowerCase().includes("precompile") ||
-                    err?.message?.toLowerCase().includes("0x0100");
-
-                if (isPrecompileRevert || true) {
-                    // Fall back to mock reactivity mode
-                    console.warn("Testnet Precompile Reverted — Enabling Mock Reactivity Mode:", err?.message?.slice(0, 100));
-                    addEvent(`🔔 Subscription registered (Mock Reactivity Mode — testnet precompile fallback)`);
-                } else {
-                    // Real error (not precompile-related)
-                    throw err;
-                }
+            if (reactivitySubRef.current || mockSubscribed) {
+                throw new Error("Already subscribed locally!");
             }
 
-            // Persist subscription per wallet address
+            addEvent(`⏳ Starting Somnia Off-Chain Reactivity via SDK...`);
+
+            // 1. Initialize SDK
+            const sdk = new SDK({
+                public: publicClient as any,
+                wallet: walletClient as any,
+            });
+
+            // 2. Subscribe using the official params from the docs
+            reactivitySubRef.current = await sdk.subscribe({
+                ethCalls: [],
+                eventContractSources: [CONTRACT_ADDRESSES.lendingMock], // Watch our LendingMock for events
+                onData: (data: SubscriptionCallback) => {
+                    console.log("⚡ Somnia Reactivity OnData:", data);
+
+                    // Prevent loops, log reaction
+                    addEvent(`⚡ [Somnia Reactivity] Event dynamically pushed! Triggering reaction...`);
+                    setMockReactions((r) => r + 1n);
+
+                    // Re-fetch all data atomically because state changed!
+                    refreshAll();
+
+                    // If we see the user drop below health factor, auto liquidate!
+                    if (address) {
+                        publicClient?.readContract({
+                            address: CONTRACT_ADDRESSES.lendingMock,
+                            abi: LENDING_MOCK_ABI,
+                            functionName: "getHealthFactor",
+                            args: [address as `0x${string}`],
+                        }).then((hf: any) => {
+                            if (hf < parseEther("1")) {
+                                addEvent(`� Auto-liquidating undercollateralized position via Reactivity!`);
+                                walletClient?.writeContract({
+                                    address: CONTRACT_ADDRESSES.liquidationManager,
+                                    abi: LIQUIDATION_MANAGER_ABI,
+                                    functionName: "executeLiquidation",
+                                    args: [address as `0x${string}`],
+                                }).then(() => {
+                                    setMockLiquidations((l) => l + 1n);
+                                }).catch(() => { });
+                            }
+                        }).catch(() => { });
+                    }
+                },
+                onError: (err: Error) => {
+                    console.error("Somnia Reactivity Error:", err);
+                    addEvent(`⚠️ Reactivity stream error: ${err.message}`);
+                }
+            });
+
             setMockSubscribed(true);
             if (typeof window !== "undefined" && address) {
                 localStorage.setItem(getMockSubKey(address), "true");
             }
+            addEvent(`✅ Registered! Off-chain Reactivity WebSocket is LIVE.`);
+
+            // Artificial delay to make UI look good
+            await new Promise(r => setTimeout(r, 1500));
             await refreshAll();
-            return hash;
         } catch (e: any) {
             const msg = parseContractError(e);
             setError(msg);
@@ -495,7 +506,7 @@ export function useReactorX() {
         } finally {
             setTxLoading(false);
         }
-    }, [walletClient, address, publicClient, refreshAll, addEvent]);
+    }, [walletClient, address, publicClient, refreshAll, addEvent, mockSubscribed]);
 
     // ── Event watchers via WebSocket ───────────────────────────────────────
     useEffect(() => {
