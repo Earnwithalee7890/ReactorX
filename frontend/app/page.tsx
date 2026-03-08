@@ -13,6 +13,7 @@ import PositionsTable from "@/components/PositionsTable";
 import LiquidationFeed from "@/components/LiquidationFeed";
 import EventLog from "@/components/EventLog";
 import ArchitectureTab from "@/components/ArchitectureTab";
+import FaucetSwapTab from "@/components/FaucetSwapTab";
 import { useReactorX } from "@/hooks/useReactorX";
 
 // ─── New User Onboarding Guide ────────────────────────────────────────────
@@ -109,7 +110,7 @@ function OnboardingGuide({ address, stats, registered }: { address?: string; sta
 // ─── Main Page ─────────────────────────────────────────────────────────────
 export default function Home() {
   const { address } = useAccount();
-  const [tab, setTab] = useState<"dashboard" | "liquidations" | "architecture">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "liquidations" | "architecture" | "swap">("dashboard");
   const [showOnboarding, setShowOnboarding] = useState(true);
 
   const {
@@ -148,6 +149,7 @@ export default function Home() {
             <div className="tab-nav">
               {([
                 { key: "dashboard", label: "Dashboard", icon: "🏠" },
+                { key: "swap", label: "Faucet & Swap", icon: "💱" },
                 { key: "liquidations", label: "Liquidations", icon: "🔴" },
                 { key: "architecture", label: "Architecture", icon: "🏗️" },
               ] as const).map((t) => (
@@ -258,6 +260,11 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* SWAP & FAUCET TAB */}
+          {tab === "swap" && (
+            <FaucetSwapTab />
           )}
 
           {/* LIQUIDATIONS TAB */}

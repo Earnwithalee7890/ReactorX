@@ -62,10 +62,32 @@ export const LIQUIDATION_MANAGER_ABI = parseAbi([
     "function setReactorEngine(address engine)",
 ]);
 
+export const MOCK_TOKEN_ABI = parseAbi([
+    "function faucet() external",
+    "function mint(address to, uint256 amount) external",
+    "function balanceOf(address account) view returns (uint256)",
+    "function decimals() view returns (uint8)",
+    "function symbol() view returns (string)",
+    "function approve(address spender, uint256 amount) returns (bool)",
+    "function allowance(address owner, address spender) view returns (uint256)",
+]);
+
+export const REACTOR_DEX_ABI = parseAbi([
+    "function swapSttForToken(address tokenOut) external payable",
+    "function swapTokenForStt(address tokenIn, uint256 amountIn) external",
+    "function swapTokenForToken(address tokenIn, address tokenOut, uint256 amountIn) external",
+    "function tokenPrices(address token) view returns (uint256)",
+    "function sttPrice() view returns (uint256)",
+]);
+
 export const CONTRACT_ADDRESSES = {
     lendingMock: process.env.NEXT_PUBLIC_LENDING_MOCK_ADDRESS as `0x${string}`,
     reactorEngine: process.env.NEXT_PUBLIC_REACTOR_ENGINE_ADDRESS as `0x${string}`,
     liquidationManager: process.env.NEXT_PUBLIC_LIQUIDATION_MANAGER_ADDRESS as `0x${string}`,
+    dex: process.env.NEXT_PUBLIC_DEX_ADDRESS as `0x${string}`,
+    usdc: process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`,
+    usdt: process.env.NEXT_PUBLIC_USDT_ADDRESS as `0x${string}`,
+    weth: process.env.NEXT_PUBLIC_WETH_ADDRESS as `0x${string}`,
 };
 
 export const SOMNIA_TESTNET = {
