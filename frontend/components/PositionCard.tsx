@@ -24,7 +24,7 @@ export default function PositionCard({ position, address, txLoading, onDeposit, 
                     Connect Your Wallet
                 </div>
                 <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>
-                    Connect MetaMask to Somnia Testnet to view and manage your lending position.
+                    Connect your wallet (MetaMask, OKX, or Bitget) to Somnia Testnet to view and manage your lending position.
                 </div>
             </div>
         );
@@ -104,7 +104,7 @@ export default function PositionCard({ position, address, txLoading, onDeposit, 
             {/* Stats grid */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 22 }}>
                 {[
-                    { label: "Collateral", value: `${collateral} ETH`, icon: "💎", color: "#fde047" },
+                    { label: "Collateral", value: `${collateral} STT`, icon: "💎", color: "#fde047" },
                     { label: "Debt", value: `${debt} USDC`, icon: "💸", color: "#fbbf24" },
                 ].map((item) => (
                     <div
@@ -130,7 +130,7 @@ export default function PositionCard({ position, address, txLoading, onDeposit, 
                 {/* Deposit */}
                 <div>
                     <label style={{ fontSize: 11, color: "var(--text-muted)", display: "block", marginBottom: 6, fontWeight: 700, letterSpacing: "0.06em" }}>
-                        DEPOSIT COLLATERAL (ETH)
+                        DEPOSIT COLLATERAL (STT — Somnia Test Token)
                     </label>
                     <div style={{ display: "flex", gap: 8 }}>
                         <input id="deposit-amount" className="input-styled" type="number" value={depositAmount}
