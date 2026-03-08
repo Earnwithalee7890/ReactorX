@@ -28,7 +28,7 @@ async function main() {
     // ============================================
     console.log("📦 [1/3] Deploying LendingMock...");
 
-    const initialPrice = ethers.parseEther("2000"); // $2000 per ETH
+    const initialPrice = ethers.parseUnits("2000", 18); // $2,000 per STT
     const liquidationThreshold = 80; // 80%
 
     const LendingMock = await ethers.getContractFactory("LendingMock");

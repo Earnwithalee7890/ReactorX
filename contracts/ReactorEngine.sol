@@ -287,6 +287,8 @@ contract ReactorEngine is ReentrancyGuard {
         emit ReactionTriggered(user, hf, liquidationExecuted, block.timestamp);
     }
 
+    receive() external payable {}
+
     // ========================================
     // VIEW FUNCTIONS
     // ========================================
