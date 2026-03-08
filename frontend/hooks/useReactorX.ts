@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { usePublicClient, useAccount, useWalletClient } from "wagmi";
-import { parseEther, formatEther } from "viem";
+import { parseEther, formatEther, parseAbi } from "viem";
 import { SDK, SubscriptionCallback } from "@somnia-chain/reactivity";
 import {
     LENDING_MOCK_ABI,
