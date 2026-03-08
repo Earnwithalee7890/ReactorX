@@ -163,7 +163,7 @@ contract LendingMock is ReentrancyGuard {
      * @notice Admin/demo function to simulate oracle price drop
      * @param newPrice New price of collateral (18 decimals)
      */
-    function updatePrice(uint256 newPrice) external onlyOwner {
+    function updatePrice(uint256 newPrice) external {
         require(newPrice > 0, "LendingMock: zero price");
         uint256 old = collateralPrice;
         collateralPrice = newPrice;

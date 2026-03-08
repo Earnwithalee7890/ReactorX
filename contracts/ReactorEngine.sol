@@ -168,7 +168,7 @@ contract ReactorEngine is ReentrancyGuard {
      *         This enables automatic invocation when LendingMock emits events
      * @param _lendingMockAddress Address of the LendingMock contract to watch
      */
-    function registerSubscription(address _lendingMockAddress) external onlyOwner {
+    function registerSubscription(address _lendingMockAddress) external {
         require(!isSubscribed, "ReactorEngine: already subscribed");
 
         // Subscribe to PositionUpdated events
@@ -267,7 +267,7 @@ contract ReactorEngine is ReentrancyGuard {
      * @notice Manual trigger for testing purposes (owner only)
      *         Simulates what Somnia validators do automatically
      */
-    function manualReact(address user) external onlyOwner nonReentrant {
+    function manualReact(address user) external nonReentrant {
         uint256 hf = lendingMock.getHealthFactor(user);
         bool liquidationExecuted = false;
 
