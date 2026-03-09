@@ -200,7 +200,7 @@ export default function FaucetSwapTab() {
                     </p>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                        {TOKENS.filter(t => t.type === "ERC20").map((token) => (
+                        {TOKENS.filter(t => t.type === "ERC20" && t.address && t.address !== "undefined").map((token) => (
                             <div key={token.symbol} className="onboarding-step" style={{ padding: '16px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 15, flex: 1 }}>
                                     <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
