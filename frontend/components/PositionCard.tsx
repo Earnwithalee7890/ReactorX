@@ -16,15 +16,15 @@ interface Props {
 
 const COLLATERAL_ASSETS = [
     { symbol: "STT", address: "0x0000000000000000000000000000000000000000", icon: "🌐" },
-    { symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, icon: "💵" },
-    { symbol: "USDT", address: CONTRACT_ADDRESSES.usdt, icon: "💳" },
-    { symbol: "WETH", address: CONTRACT_ADDRESSES.weth, icon: "⟠" },
+    { symbol: "USDC", address: CONTRACT_ADDRESSES.usdc || "0x7a9dcF9Bb88535C3Eba3bE8FAE4DDF0bF514c2eC", icon: "💵" },
+    { symbol: "USDT", address: CONTRACT_ADDRESSES.usdt || "0xE2E35A81135688A394eC0186Ed707A907D2Bf2e4", icon: "💳" },
+    { symbol: "WETH", address: CONTRACT_ADDRESSES.weth || "0xF5A764C94ae8Aa62b48AbE2eb66b060A2252C355", icon: "⟠" },
 ];
 
 const BORROW_ASSETS = [
-    { symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, icon: "💵" },
-    { symbol: "USDT", address: CONTRACT_ADDRESSES.usdt, icon: "💳" },
-    { symbol: "WETH", address: CONTRACT_ADDRESSES.weth, icon: "⟠" },
+    { symbol: "USDC", address: CONTRACT_ADDRESSES.usdc || "0x7a9dcF9Bb88535C3Eba3bE8FAE4DDF0bF514c2eC", icon: "💵" },
+    { symbol: "USDT", address: CONTRACT_ADDRESSES.usdt || "0xE2E35A81135688A394eC0186Ed707A907D2Bf2e4", icon: "💳" },
+    { symbol: "WETH", address: CONTRACT_ADDRESSES.weth || "0xF5A764C94ae8Aa62b48AbE2eb66b060A2252C355", icon: "⟠" },
 ];
 
 export default function PositionCard({ position, address, txLoading, onDeposit, onBorrow, onRepay }: Props) {

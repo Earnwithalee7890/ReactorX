@@ -11,15 +11,15 @@ const TOKENS = [
         icon: "https://somnia.network/favicon.ico", color: "#f59e0b"
     },
     {
-        symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, decimals: 6, type: "ERC20",
+        symbol: "USDC", address: CONTRACT_ADDRESSES.usdc || "0x7a9dcF9Bb88535C3Eba3bE8FAE4DDF0bF514c2eC", decimals: 18, type: "ERC20",
         icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png", color: "#2775ca"
     },
     {
-        symbol: "USDT", address: CONTRACT_ADDRESSES.usdt, decimals: 6, type: "ERC20",
+        symbol: "USDT", address: CONTRACT_ADDRESSES.usdt || "0xE2E35A81135688A394eC0186Ed707A907D2Bf2e4", decimals: 18, type: "ERC20",
         icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png", color: "#26a17b"
     },
     {
-        symbol: "WETH", address: CONTRACT_ADDRESSES.weth, decimals: 18, type: "ERC20",
+        symbol: "WETH", address: CONTRACT_ADDRESSES.weth || "0xF5A764C94ae8Aa62b48AbE2eb66b060A2252C355", decimals: 18, type: "ERC20",
         icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png", color: "#627eea"
     },
 ];
@@ -134,8 +134,10 @@ export default function FaucetSwapTab() {
         if (!walletClient || !publicClient || !amountIn) return;
         try {
             setLoadingMsg(`Swapping ${fromToken.symbol} to ${toToken.symbol}...`);
-            const dexAddr = CONTRACT_ADDRESSES.dex;
-            if (!dexAddr || (dexAddr as any) === "undefined") throw new Error("DEX Address not found");
+            const dexAddr = CONTRACT_ADDRESSES.dex || "0xE213403699406bA58f2f16F94b94BB83a4490024";
+            if (!dexAddr || dexAddr === "0x0000000000000000000000000000000000000000") {
+                throw new Error("DEX Address not found. Please refresh or update ENV.");
+            }
 
             let hash;
             if (fromToken.type === "Native" && toToken.type === "ERC20") {
@@ -191,12 +193,12 @@ export default function FaucetSwapTab() {
     return (
         <div className="page-pad">
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 30, margin: "0 auto", maxWidth: 1100 }}>
-                {/* ─── FAUCET PANEL ─── */}
+                {/* ─── DAILY REWARDS PANEL ─── */}
                 <div className="card card-shiny" style={{ padding: 32 }}>
                     <div className="stat-card-accent" style={{ background: "linear-gradient(90deg, var(--reactor-purple), var(--reactor-cyan), transparent)" }} />
-                    <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>💧 Token Faucet</h2>
+                    <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>💰 Daily Rewards</h2>
                     <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 30, lineHeight: 1.6 }}>
-                        Get 1,000 mock tokens every 24 hours to test borrowing, pooling, and liquidations.
+                        Check-in daily to receive 1,000 mock tokens for testing and liquidity provision.
                     </p>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

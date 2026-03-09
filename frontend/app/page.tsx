@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 
@@ -64,19 +65,32 @@ export default function Home() {
             {/* DASHBOARD */}
             {tab === "dashboard" && (
               <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                  <div>
-                    <h1 style={{ fontSize: 32, fontWeight: 900, marginBottom: 8 }} className="gradient-text-purple">Welcome to ReactorX</h1>
-                    <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Autonomous Liquidation Protocol on Somnia Testnet.</p>
+                <div className="card card-glass" style={{
+                  padding: "40px",
+                  position: "relative",
+                  overflow: "hidden",
+                  borderRadius: "24px",
+                  background: "linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,182,212,0.05))",
+                  border: "1px solid rgba(139,92,246,0.2)",
+                  boxShadow: "0 0 40px rgba(139,92,246,0.1)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}>
+                  <div style={{ position: "relative", zIndex: 2 }}>
+                    <h1 style={{ fontSize: 42, fontWeight: 900, marginBottom: 12, letterSpacing: "-0.03em" }} className="gradient-text-purple">System Status: Active</h1>
+                    <p style={{ color: "var(--text-muted)", fontSize: 16, maxWidth: 500, lineHeight: 1.6 }}>
+                      Welcome back to the ReactorX Terminal. All autonomous liquidation systems are currently monitoring the Somnia Testnet liquidity pools.
+                    </p>
+                    <div style={{ display: "flex", gap: 16, marginTop: 24 }}>
+                      <button className="btn-primary" onClick={() => setTab("faucet")} style={{ padding: "12px 24px" }}>💰 Daily Check-in</button>
+                      <button className="btn-secondary" onClick={() => refreshAll()} style={{ padding: "12px 24px" }}>↻ Sync Terminal</button>
+                    </div>
                   </div>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => refreshAll()}
-                    disabled={loading}
-                    style={{ padding: "10px 20px" }}
-                  >
-                    {loading ? "Refreshing..." : "↻ Sync Pulse"}
-                  </button>
+                  <div style={{ position: "relative", width: 180, height: 180, opacity: 0.8 }} className="hide-mobile">
+                    <img src="/brand-logo.png" alt="ReactorX" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                  </div>
+                  <div style={{ position: "absolute", top: -100, right: -100, width: 400, height: 400, background: "radial-gradient(circle, var(--reactor-purple) 0%, transparent 70%)", opacity: 0.15, pointerEvents: "none" }} />
                 </div>
 
                 <StatsRow stats={stats} />

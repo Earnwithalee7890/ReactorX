@@ -272,7 +272,7 @@ export default function Header() {
                         }}
                     >
                         <Image
-                            src="/logo.png"
+                            src="/brand-logo.png"
                             alt="ReactorX"
                             width={32}
                             height={32}

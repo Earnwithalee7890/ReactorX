@@ -84,13 +84,13 @@ export const REACTOR_DEX_ABI = parseAbi([
 ]);
 
 export const CONTRACT_ADDRESSES = {
-    lendingMock: process.env.NEXT_PUBLIC_LENDING_MOCK_ADDRESS as `0x${string}`,
-    reactorEngine: process.env.NEXT_PUBLIC_REACTOR_ENGINE_ADDRESS as `0x${string}`,
-    liquidationManager: process.env.NEXT_PUBLIC_LIQUIDATION_MANAGER_ADDRESS as `0x${string}`,
-    dex: process.env.NEXT_PUBLIC_DEX_ADDRESS as `0x${string}`,
-    usdc: process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`,
-    usdt: process.env.NEXT_PUBLIC_USDT_ADDRESS as `0x${string}`,
-    weth: process.env.NEXT_PUBLIC_WETH_ADDRESS as `0x${string}`,
+    lendingMock: (process.env.NEXT_PUBLIC_LENDING_MOCK_ADDRESS || "0xe64E4714b0ea6F8DA078797c1c34e44Be973731D") as `0x${string}`,
+    reactorEngine: (process.env.NEXT_PUBLIC_REACTOR_ENGINE_ADDRESS || "0x7cD235cBf72E161483E6Ebe4168c76e6911D6a45") as `0x${string}`,
+    liquidationManager: (process.env.NEXT_PUBLIC_LIQUIDATION_MANAGER_ADDRESS || "0x185909a9158D08B523ea1d9FCBD34DFF439eBe98") as `0x${string}`,
+    dex: (process.env.NEXT_PUBLIC_DEX_ADDRESS || "0xE213403699406bA58f2f16F94b94BB83a4490024") as `0x${string}`,
+    usdc: (process.env.NEXT_PUBLIC_USDC_ADDRESS || "0x7a9dcF9Bb88535C3Eba3bE8FAE4DDF0bF514c2eC") as `0x${string}`,
+    usdt: (process.env.NEXT_PUBLIC_USDT_ADDRESS || "0xE2E35A81135688A394eC0186Ed707A907D2Bf2e4") as `0x${string}`,
+    weth: (process.env.NEXT_PUBLIC_WETH_ADDRESS || "0xF5A764C94ae8Aa62b48AbE2eb66b060A2252C355") as `0x${string}`,
 };
 
 export const SOMNIA_TESTNET = {
