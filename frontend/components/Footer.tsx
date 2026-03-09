@@ -19,26 +19,26 @@ export default function Footer() {
 
     return (
         <footer style={{
-            borderTop: "1px solid rgba(251,191,36,0.08)",
-            background: "linear-gradient(180deg, transparent, rgba(2,6,23,0.6))",
+            borderTop: "1px solid var(--bg-border-bright)",
+            background: "linear-gradient(180deg, transparent, var(--bg-secondary))",
             padding: "48px 40px 32px",
             marginTop: "auto"
         }}>
             <div style={{ maxWidth: 1200, margin: "0 auto" }}>
                 {/* Top Row */}
                 <div style={{
-                    display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr",
+                    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
                     gap: 40, marginBottom: 40
                 }}>
                     {/* Brand */}
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                            <span style={{ fontSize: 18, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em" }}>
+                            <span style={{ fontSize: 18, fontWeight: 900, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
                                 Reactor<span style={{ color: "var(--reactor-gold)" }}>X</span>
                             </span>
                         </div>
                         <p style={{
-                            fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.7,
+                            fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7,
                             maxWidth: 340
                         }}>
                             Autonomous DeFi lending with native on-chain reactivity.
@@ -62,13 +62,13 @@ export default function Footer() {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     style={{
-                                        fontSize: 13, color: "rgba(255,255,255,0.5)",
+                                        fontSize: 13, color: "var(--text-secondary)",
                                         textDecoration: "none", display: "flex",
                                         alignItems: "center", gap: 8,
                                         transition: "color 0.2s"
                                     }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
+                                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--reactor-gold)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
                                 >
                                     <span style={{ fontSize: 14 }}>{link.icon}</span>
                                     {link.label}
@@ -88,9 +88,9 @@ export default function Footer() {
                         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                             {stats.map(s => (
                                 <div key={s.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>{s.label}</span>
+                                    <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{s.label}</span>
                                     <span style={{
-                                        fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.6)",
+                                        fontSize: 12, fontWeight: 700, color: "var(--text-secondary)",
                                         fontFamily: "'JetBrains Mono', monospace"
                                     }}>{s.value}</span>
                                 </div>
@@ -109,7 +109,7 @@ export default function Footer() {
 
                 {/* Divider */}
                 <div style={{
-                    height: 1, background: "linear-gradient(90deg, transparent, rgba(251,191,36,0.15), transparent)",
+                    height: 1, background: "linear-gradient(90deg, transparent, var(--bg-border-bright), transparent)",
                     marginBottom: 24
                 }} />
 
@@ -118,21 +118,21 @@ export default function Footer() {
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                     flexWrap: "wrap", gap: 12
                 }}>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.25)" }}>
+                    <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
                         © {year} ReactorX Protocol · Built for Somnia Reactivity Mini Hackathon
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                         <span style={{
-                            fontSize: 11, color: "rgba(255,255,255,0.2)",
+                            fontSize: 11, color: "var(--text-muted)", opacity: 0.6,
                             fontFamily: "'JetBrains Mono', monospace"
                         }}>
                             v1.0.0
                         </span>
                         <span style={{
                             fontSize: 10, padding: "3px 10px", borderRadius: 6,
-                            background: "rgba(251,191,36,0.08)",
-                            border: "1px solid rgba(251,191,36,0.15)",
-                            color: "rgba(251,191,36,0.6)", fontWeight: 700,
+                            background: "rgba(251,191,36,0.1)",
+                            border: "1px solid var(--reactor-gold-glow)",
+                            color: "var(--reactor-gold)", fontWeight: 700,
                             letterSpacing: "0.06em"
                         }}>
                             TESTNET
