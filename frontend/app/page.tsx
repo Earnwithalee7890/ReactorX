@@ -150,7 +150,7 @@ export default function Home() {
             {tab === "faucet" && (
               <div className="animate-fade-in">
                 <div style={{ marginBottom: 32 }}>
-                  <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 8 }} className="gradient-text-purple">Faucet & Liquidity</h1>
+                  <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 8 }} className="gradient-text-purple">Faucet & Swap</h1>
                   <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Get testnet assets and swap between them.</p>
                 </div>
                 <FaucetSwapTab />
