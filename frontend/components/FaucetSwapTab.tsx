@@ -191,7 +191,7 @@ export default function FaucetSwapTab() {
 
     return (
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 28 }}>
                 {/* ─── DAILY REWARDS PANEL ─── */}
                 <div style={{
                     borderRadius: 24, overflow: "hidden",
@@ -342,21 +342,21 @@ export default function FaucetSwapTab() {
                                         Bal: {balances[fromToken.address] ? parseFloat(balances[fromToken.address]).toFixed(4) : "0"}
                                     </span>
                                 </div>
-                                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                                     <div style={{
                                         display: "flex", alignItems: "center", gap: 8,
                                         background: "rgba(255,255,255,0.05)", borderRadius: 12,
                                         padding: "8px 12px", border: "1px solid rgba(255,255,255,0.08)",
-                                        minWidth: 120
+                                        flexShrink: 0
                                     }}>
-                                        <img src={fromToken.icon} style={{ width: 24, height: 24, borderRadius: "50%" }} />
+                                        <img src={fromToken.icon} alt="" style={{ width: 22, height: 22, borderRadius: "50%" }} />
                                         <select
                                             value={fromToken.symbol}
                                             onChange={(e) => setFromToken(TOKENS.find(t => t.symbol === e.target.value)!)}
                                             style={{
                                                 background: "transparent", border: "none", color: "#fff",
                                                 fontSize: 14, fontWeight: 700, cursor: "pointer", outline: "none",
-                                                fontFamily: "'Space Grotesk', sans-serif"
+                                                fontFamily: "'Space Grotesk', sans-serif", width: 60
                                             }}
                                         >
                                             {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map(t =>
@@ -370,10 +370,11 @@ export default function FaucetSwapTab() {
                                         value={amountIn}
                                         onChange={(e) => setAmountIn(e.target.value)}
                                         style={{
-                                            flex: 1, background: "transparent", border: "none",
-                                            color: "#fff", fontSize: 26, fontWeight: 800,
+                                            flex: 1, minWidth: 0, background: "transparent", border: "none",
+                                            color: "#fff", fontSize: 22, fontWeight: 800,
                                             textAlign: "right", outline: "none",
-                                            fontFamily: "'JetBrains Mono', monospace"
+                                            fontFamily: "'JetBrains Mono', monospace",
+                                            padding: "4px 0"
                                         }}
                                     />
                                 </div>
@@ -402,21 +403,21 @@ export default function FaucetSwapTab() {
                                         Target: {toToken.symbol}
                                     </span>
                                 </div>
-                                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                                     <div style={{
                                         display: "flex", alignItems: "center", gap: 8,
                                         background: "rgba(255,255,255,0.05)", borderRadius: 12,
                                         padding: "8px 12px", border: "1px solid rgba(255,255,255,0.08)",
-                                        minWidth: 120
+                                        flexShrink: 0
                                     }}>
-                                        <img src={toToken.icon} style={{ width: 24, height: 24, borderRadius: "50%" }} />
+                                        <img src={toToken.icon} alt="" style={{ width: 22, height: 22, borderRadius: "50%" }} />
                                         <select
                                             value={toToken.symbol}
                                             onChange={(e) => setToToken(TOKENS.find(t => t.symbol === e.target.value)!)}
                                             style={{
                                                 background: "transparent", border: "none", color: "#fff",
                                                 fontSize: 14, fontWeight: 700, cursor: "pointer", outline: "none",
-                                                fontFamily: "'Space Grotesk', sans-serif"
+                                                fontFamily: "'Space Grotesk', sans-serif", width: 60
                                             }}
                                         >
                                             {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map(t =>
@@ -425,9 +426,10 @@ export default function FaucetSwapTab() {
                                         </select>
                                     </div>
                                     <div style={{
-                                        flex: 1, fontSize: 26, fontWeight: 800, textAlign: "right",
+                                        flex: 1, minWidth: 0, fontSize: 22, fontWeight: 800, textAlign: "right",
                                         color: amountOut && amountOut !== "Error" ? "#fff" : "rgba(255,255,255,0.2)",
-                                        fontFamily: "'JetBrains Mono', monospace"
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                        overflow: "hidden", textOverflow: "ellipsis"
                                     }}>
                                         {amountOut || "0.00"}
                                     </div>
