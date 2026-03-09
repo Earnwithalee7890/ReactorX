@@ -8,7 +8,7 @@ import { useToast } from "./ToastProvider";
 const TOKENS = [
     {
         symbol: "STT", address: "native", decimals: 18, type: "Native",
-        icon: "https://somnia.network/favicon.ico", color: "#f59e0b"
+        icon: "/logo-new.png", color: "#f59e0b"
     },
     {
         symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, decimals: 6, type: "ERC20",
