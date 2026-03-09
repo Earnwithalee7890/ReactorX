@@ -84,7 +84,7 @@ function getMockSubKey(address: string | undefined) {
 export function useReactorX() {
     const publicClient = usePublicClient();
     const { address } = useAccount();
-    const { data: walletClient } = useWalletClient();
+    const { data: walletClient } = useWalletClient({ chainId: CONTRACT_ADDRESSES.chainId });
 
     const [position, setPosition] = useState<Position | null>(null);
     const [allPositions, setAllPositions] = useState<{ user: string; position: Position }[]>([]);
@@ -293,8 +293,16 @@ export function useReactorX() {
 
     // ── Guard: wallet must be connected ───────────────────────────────────
     function requireWallet() {
-        if (!walletClient || !address) {
-            throw new Error("Wallet not connected. Please connect your wallet (MetaMask, OKX, or Bitget) to Somnia Testnet.");
+        if (!address) {
+            throw new Error("No wallet connected. Please click 'Connect Wallet' in the top right corner.");
+        }
+        if (!walletClient) {
+            // Check if on wrong network
+            const currentChainId = publicClient?.chain?.id;
+            if (currentChainId && currentChainId !== CONTRACT_ADDRESSES.chainId) {
+                throw new Error(`Connected to wrong network. Please switch to Somnia Testnet (Chain ID: ${CONTRACT_ADDRESSES.chainId}) in MetaMask.`);
+            }
+            throw new Error("Wallet client is not ready. If you just connected or switched accounts, please wait a moment and try again.");
         }
     }
 

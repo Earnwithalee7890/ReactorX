@@ -92,6 +92,7 @@ export const CONTRACT_ADDRESSES = {
     usdc: (process.env.NEXT_PUBLIC_USDC_ADDRESS || "0x7a9dcF9Bb88535C3Eba3bE8FAE4DDF0bF514c2eC") as `0x${string}`,
     usdt: (process.env.NEXT_PUBLIC_USDT_ADDRESS || "0xE2E35A81135688A394eC0186Ed707A907D2Bf2e4") as `0x${string}`,
     weth: (process.env.NEXT_PUBLIC_WETH_ADDRESS || "0xF5A764C94ae8Aa62b48AbE2eb66b060A2252C355") as `0x${string}`,
+    chainId: 50312,
 };
 
 export const SOMNIA_TESTNET = {
