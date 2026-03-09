@@ -196,7 +196,7 @@ export default function Home() {
             {tab === "settings" && <SettingsTab />}
 
             {/* LIQUIDITY */}
-            {tab === "liquidity" && <LiquidityTab position={position} />}
+            {tab === "liquidity" && <LiquidityTab position={position} allPositions={allPositions} />}
 
             <Footer />
           </main>
