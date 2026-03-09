@@ -18,6 +18,7 @@ import Sidebar from "@/components/Sidebar";
 import AIAssistant from "@/components/AIAssistant";
 import SettingsTab from "@/components/SettingsTab";
 import Footer from "@/components/Footer";
+import LiquidityTab from "@/components/LiquidityTab";
 import { useReactorX } from "@/hooks/useReactorX";
 
 export default function Home() {
@@ -193,6 +194,9 @@ export default function Home() {
 
             {/* SETTINGS */}
             {tab === "settings" && <SettingsTab />}
+
+            {/* LIQUIDITY */}
+            {tab === "liquidity" && <LiquidityTab position={position} />}
 
             <Footer />
           </main>
