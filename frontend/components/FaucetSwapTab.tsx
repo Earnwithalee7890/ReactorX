@@ -44,7 +44,7 @@ export default function FaucetSwapTab() {
             const sttBal = await publicClient.getBalance({ address });
             newBals["native"] = formatEther(sttBal);
             for (const t of TOKENS.filter(t => t.type === "ERC20")) {
-                if (!t.address || t.address === "undefined") continue;
+                if (!t.address || (t.address as any) === "undefined") continue;
                 const bal = await publicClient.readContract({
                     address: t.address as `0x${string}`,
                     abi: MOCK_TOKEN_ABI,
@@ -135,7 +135,7 @@ export default function FaucetSwapTab() {
         try {
             setLoadingMsg(`Swapping ${fromToken.symbol} to ${toToken.symbol}...`);
             const dexAddr = CONTRACT_ADDRESSES.dex;
-            if (!dexAddr || dexAddr === "undefined") throw new Error("DEX Address not found");
+            if (!dexAddr || (dexAddr as any) === "undefined") throw new Error("DEX Address not found");
 
             let hash;
             if (fromToken.type === "Native" && toToken.type === "ERC20") {
@@ -200,7 +200,7 @@ export default function FaucetSwapTab() {
                     </p>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                        {TOKENS.filter(t => t.type === "ERC20" && t.address && t.address !== "undefined").map((token) => (
+                        {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map((token) => (
                             <div key={token.symbol} className="onboarding-step" style={{ padding: '16px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 15, flex: 1 }}>
                                     <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
@@ -254,7 +254,7 @@ export default function FaucetSwapTab() {
                                         onChange={(e) => setFromToken(TOKENS.find(t => t.symbol === e.target.value)!)}
                                         style={{ width: '100%', fontSize: 14, fontWeight: 700, height: 48, paddingLeft: 35 }}
                                     >
-                                        {TOKENS.map(t => <option key={t.symbol} value={t.symbol}>{t.symbol}</option>)}
+                                        {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map(t => <option key={t.symbol} value={t.symbol}>{t.symbol}</option>)}
                                     </select>
                                 </div>
                                 <input
@@ -296,7 +296,7 @@ export default function FaucetSwapTab() {
                                         onChange={(e) => setToToken(TOKENS.find(t => t.symbol === e.target.value)!)}
                                         style={{ width: '100%', fontSize: 14, fontWeight: 700, height: 48, paddingLeft: 35 }}
                                     >
-                                        {TOKENS.map(t => <option key={t.symbol} value={t.symbol}>{t.symbol}</option>)}
+                                        {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map(t => <option key={t.symbol} value={t.symbol}>{t.symbol}</option>)}
                                     </select>
                                 </div>
                                 <div style={{ flex: 1, fontSize: 24, fontWeight: 800, textAlign: 'right', color: amountOut ? "var(--text-primary)" : "var(--text-muted)" }}>
