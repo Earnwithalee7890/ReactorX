@@ -191,7 +191,7 @@ export default function FaucetSwapTab() {
 
     return (
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 28 }}>
+            <div className="grid-2-col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 28 }}>
                 {/* ─── DAILY REWARDS PANEL ─── */}
                 <div style={{
                     borderRadius: 24, overflow: "hidden",

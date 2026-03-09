@@ -68,7 +68,7 @@ export default function Home() {
             {/* DASHBOARD */}
             {tab === "dashboard" && (
               <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-                <div className="card card-glass" style={{
+                <div className="card card-glass dashboard-hero" style={{
                   padding: "48px",
                   position: "relative",
                   overflow: "hidden",

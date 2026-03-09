@@ -19,7 +19,7 @@ export default function LiquidityTab({ position }: Props) {
                 <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Manage your collateralized positions and debt overview.</p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+            <div className="grid-2-col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
                 {/* Deposited Panel */}
                 <div style={{
                     borderRadius: 24, padding: "32px",

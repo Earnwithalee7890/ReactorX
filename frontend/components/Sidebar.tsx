@@ -83,12 +83,15 @@ export default function Sidebar({ activeTab, onTabChange, position }: Props) {
                                 }}
                             >
                                 {isActive && (
-                                    <div style={{
-                                        position: "absolute", left: 0, top: "20%", bottom: "20%",
-                                        width: 3, borderRadius: 4,
-                                        background: "var(--reactor-gold)",
-                                        boxShadow: "0 0 8px rgba(251,191,36,0.5)"
-                                    }} />
+                                    <div
+                                        className="sidebar-item-active-bar"
+                                        style={{
+                                            position: "absolute", left: 0, top: "20%", bottom: "20%",
+                                            width: 3, borderRadius: 4,
+                                            background: "var(--reactor-gold)",
+                                            boxShadow: "0 0 8px rgba(251,191,36,0.5)"
+                                        }}
+                                    />
                                 )}
                                 <div style={{
                                     width: 30, height: 30, borderRadius: 9,
