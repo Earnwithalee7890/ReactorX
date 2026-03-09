@@ -35,20 +35,19 @@ export default function Sidebar({ activeTab, onTabChange, position }: Props) {
                 padding: "24px 20px 20px",
                 borderBottom: "1px solid rgba(251,191,36,0.06)"
             }}>
-                <div style={{
-                    display: "flex", alignItems: "center", gap: 10
-                }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{
                         width: 32, height: 32, borderRadius: 10,
                         background: "linear-gradient(135deg, var(--reactor-gold), #b45309)",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 14, fontWeight: 900, color: "#000"
+                        fontSize: 12, fontWeight: 900, color: "#000",
+                        fontFamily: "'Space Grotesk', sans-serif"
                     }}>RX</div>
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", letterSpacing: "-0.01em" }}>
+                        <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "-0.01em" }}>
                             Reactor<span style={{ color: "var(--reactor-gold)" }}>X</span>
                         </div>
-                        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontWeight: 600, letterSpacing: "0.08em" }}>
+                        <div style={{ fontSize: 9, color: "var(--text-muted)", fontWeight: 600, letterSpacing: "0.08em" }}>
                             SOMNIA DEFI
                         </div>
                     </div>
@@ -58,9 +57,9 @@ export default function Sidebar({ activeTab, onTabChange, position }: Props) {
             {/* ── Navigation ── */}
             <div style={{ padding: "16px 12px", flex: 1 }}>
                 <div style={{
-                    fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,0.2)",
+                    fontSize: 9, fontWeight: 800, color: "var(--text-muted)",
                     letterSpacing: "0.14em", textTransform: "uppercase",
-                    padding: "0 8px", marginBottom: 10
+                    padding: "0 8px", marginBottom: 10, opacity: 0.6
                 }}>
                     NAVIGATE
                 </div>
@@ -71,7 +70,6 @@ export default function Sidebar({ activeTab, onTabChange, position }: Props) {
                         return (
                             <div
                                 key={item.id}
-                                className="sidebar-item"
                                 onClick={() => onTabChange(item.id)}
                                 style={{
                                     display: "flex", alignItems: "center", gap: 12,
@@ -87,7 +85,6 @@ export default function Sidebar({ activeTab, onTabChange, position }: Props) {
                                     position: "relative"
                                 }}
                             >
-                                {/* Active indicator bar */}
                                 {isActive && (
                                     <div style={{
                                         position: "absolute", left: 0, top: "20%", bottom: "20%",
@@ -108,7 +105,7 @@ export default function Sidebar({ activeTab, onTabChange, position }: Props) {
                                 </div>
                                 <span style={{
                                     fontSize: 13, fontWeight: isActive ? 700 : 500,
-                                    color: isActive ? "#fff" : "rgba(255,255,255,0.45)",
+                                    color: isActive ? "var(--text-primary)" : "var(--text-muted)",
                                     transition: "all 0.2s",
                                     letterSpacing: "-0.01em"
                                 }}>
@@ -120,72 +117,85 @@ export default function Sidebar({ activeTab, onTabChange, position }: Props) {
                 </div>
             </div>
 
-            {/* ── Liquidity Summary ── */}
-            <div style={{ padding: "0 12px 16px" }}>
-                <div style={{
-                    borderRadius: 16, overflow: "hidden",
-                    background: "linear-gradient(135deg, rgba(251,191,36,0.05), rgba(16,185,129,0.03))",
-                    border: "1px solid rgba(251,191,36,0.08)"
-                }}>
+            {/* ── Liquidity Card Button ── */}
+            <div style={{ padding: "0 12px 12px" }}>
+                <button
+                    onClick={() => onTabChange("dashboard")}
+                    style={{
+                        width: "100%", cursor: "pointer",
+                        borderRadius: 16, overflow: "hidden",
+                        background: "linear-gradient(135deg, #1a1a2e, #16213e)",
+                        border: "1px solid rgba(251,191,36,0.15)",
+                        padding: 0, textAlign: "left",
+                        transition: "all 0.3s ease",
+                        boxShadow: "0 4px 20px rgba(0,0,0,0.3)"
+                    }}
+                >
+                    {/* Gradient top bar */}
+                    <div style={{
+                        height: 3,
+                        background: "linear-gradient(90deg, #fbbf24, #10b981, #818cf8)"
+                    }} />
+
                     {/* Header */}
                     <div style={{
                         padding: "14px 16px 10px",
-                        borderBottom: "1px solid rgba(255,255,255,0.04)"
+                        display: "flex", alignItems: "center", justifyContent: "space-between"
                     }}>
-                        <div style={{
-                            fontSize: 10, fontWeight: 800, color: "var(--reactor-gold)",
-                            letterSpacing: "0.1em", display: "flex",
-                            alignItems: "center", gap: 6
+                        <span style={{
+                            fontSize: 11, fontWeight: 800, color: "var(--reactor-gold)",
+                            letterSpacing: "0.08em"
                         }}>
-                            <span style={{ fontSize: 12 }}>💰</span>
-                            YOUR LIQUIDITY
-                        </div>
+                            💰 LIQUIDITY
+                        </span>
+                        <span style={{
+                            fontSize: 9, padding: "2px 6px", borderRadius: 4,
+                            background: "rgba(16,185,129,0.15)", color: "#34d399",
+                            fontWeight: 700
+                        }}>LIVE</span>
                     </div>
 
-                    {/* Stats */}
-                    <div style={{ padding: "12px 16px" }}>
-                        {[
-                            { label: "Deposited", value: collateral, color: "#34d399", prefix: "$" },
-                            { label: "Borrowed", value: debt, color: "#a78bfa", prefix: "$" },
-                        ].map((row) => (
-                            <div key={row.label} style={{
-                                display: "flex", justifyContent: "space-between", alignItems: "center",
-                                padding: "8px 0",
-                                borderBottom: "1px solid rgba(255,255,255,0.03)"
-                            }}>
-                                <span style={{
-                                    fontSize: 11, color: "rgba(255,255,255,0.35)", fontWeight: 500
-                                }}>{row.label}</span>
-                                <span style={{
-                                    fontSize: 13, fontWeight: 800, color: row.color,
-                                    fontFamily: "'JetBrains Mono', monospace"
-                                }}>{row.prefix}{row.value}</span>
-                            </div>
-                        ))}
-
-                        {/* Net Value */}
+                    {/* Stats rows */}
+                    <div style={{ padding: "0 16px 14px" }}>
                         <div style={{
                             display: "flex", justifyContent: "space-between", alignItems: "center",
-                            padding: "10px 0 2px",
+                            padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)"
                         }}>
+                            <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500 }}>Deposited</span>
                             <span style={{
-                                fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: 700
-                            }}>Net Value</span>
+                                fontSize: 13, fontWeight: 800, color: "#34d399",
+                                fontFamily: "'JetBrains Mono', monospace"
+                            }}>${collateral}</span>
+                        </div>
+                        <div style={{
+                            display: "flex", justifyContent: "space-between", alignItems: "center",
+                            padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)"
+                        }}>
+                            <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500 }}>Borrowed</span>
+                            <span style={{
+                                fontSize: 13, fontWeight: 800, color: "#a78bfa",
+                                fontFamily: "'JetBrains Mono', monospace"
+                            }}>${debt}</span>
+                        </div>
+                        <div style={{
+                            display: "flex", justifyContent: "space-between", alignItems: "center",
+                            padding: "8px 0 0"
+                        }}>
+                            <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700 }}>Net Value</span>
                             <span style={{
                                 fontSize: 15, fontWeight: 900, color: "var(--reactor-gold)",
-                                fontFamily: "'JetBrains Mono', monospace",
-                                textShadow: "0 0 20px rgba(251,191,36,0.2)"
+                                fontFamily: "'JetBrains Mono', monospace"
                             }}>${netValue}</span>
                         </div>
                     </div>
-                </div>
+                </button>
             </div>
 
             {/* ── Network Status ── */}
             <div style={{
                 padding: "14px 20px",
                 borderTop: "1px solid rgba(255,255,255,0.04)",
-                background: "rgba(0,0,0,0.2)"
+                background: "rgba(0,0,0,0.15)"
             }}>
                 <div style={{
                     display: "flex", alignItems: "center", justifyContent: "space-between"
@@ -196,12 +206,12 @@ export default function Sidebar({ activeTab, onTabChange, position }: Props) {
                             background: "#10b981", boxShadow: "0 0 8px #10b981",
                             animation: "pulse-glow 2s ease-in-out infinite"
                         }} />
-                        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>
+                        <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600 }}>
                             Shannon Testnet
                         </span>
                     </div>
                     <span style={{
-                        fontSize: 9, color: "rgba(255,255,255,0.2)",
+                        fontSize: 9, color: "var(--text-muted)", opacity: 0.5,
                         fontFamily: "'JetBrains Mono', monospace"
                     }}>
                         ID: 50312
