@@ -7,6 +7,7 @@ import {
     LENDING_MOCK_ABI,
     REACTOR_ENGINE_ABI,
     LIQUIDATION_MANAGER_ABI,
+    MOCK_TOKEN_ABI,
     CONTRACT_ADDRESSES,
 } from "@/lib/contracts";
 
@@ -298,29 +299,45 @@ export function useReactorX() {
     }
 
     // ── Write: Deposit Collateral ──────────────────────────────────────────
-    const depositCollateral = useCallback(async (amount: string) => {
+    const depositCollateral = useCallback(async (tokenAddr: string, amount: string, symbol: string) => {
         setTxLoading(true);
         setError(null);
         try {
             const parsedAmount = Number(amount);
             if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
-                throw new Error("Invalid deposit amount. Please enter a valid positive number.");
+                throw new Error("Invalid deposit amount.");
             }
             requireWallet();
 
-            const amountWei = parseEther(amount);
-            if (amountWei <= 0n) throw new Error("Parsed amount must be strictly positive.");
+            const isNative = tokenAddr === "native" || tokenAddr === "0x0000000000000000000000000000000000000000";
+            const amountWei = parseEther(amount); // Simplified: assume 18 decimals for mocks
 
-            addEvent(`⏳ Submitting deposit of ${amount} STT collateral...`);
+            if (!isNative) {
+                addEvent(`⏳ Approving ${symbol} for collateral...`);
+                const appHash = await walletClient!.writeContract({
+                    address: tokenAddr as `0x${string}`,
+                    abi: MOCK_TOKEN_ABI,
+                    functionName: "approve",
+                    args: [CONTRACT_ADDRESSES.lendingMock, amountWei],
+                });
+                await publicClient?.waitForTransactionReceipt({ hash: appHash });
+            }
+
+            addEvent(`⏳ Submitting deposit of ${amount} ${symbol} collateral...`);
             const hash = await walletClient!.writeContract({
                 address: CONTRACT_ADDRESSES.lendingMock,
                 abi: LENDING_MOCK_ABI,
                 functionName: "depositCollateral",
-                value: amountWei,
+                args: [isNative ? "0x0000000000000000000000000000000000000000" : tokenAddr as `0x${string}`, amountWei],
+                value: isNative ? amountWei : 0n,
             });
-            addEvent(`⬆️ Deposited ${amount} STT collateral | tx: ${hash.slice(0, 10)}...`);
+
+            addEvent(`⬆️ Deposited ${amount} ${symbol} | tx: ${hash.slice(0, 10)}...`);
             await publicClient?.waitForTransactionReceipt({ hash });
             addEvent(`✅ Deposit confirmed on-chain!`);
+
+            // Critical: wait a bit for RPC consistency
+            await new Promise(r => setTimeout(r, 1000));
             await refreshAll();
             return hash;
         } catch (e: any) {
@@ -339,11 +356,11 @@ export function useReactorX() {
         try {
             const parsedAmount = Number(amount);
             if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
-                throw new Error("Invalid borrow amount. Please enter a valid positive number.");
+                throw new Error("Invalid borrow amount.");
             }
             requireWallet();
 
-            const amountWei = parseEther(amount); // Simplified: assume 18 decimals for hackathon mocks
+            const amountWei = parseEther(amount);
 
             addEvent(`⏳ Submitting borrow of ${amount} ${symbol}...`);
             const hash = await walletClient!.writeContract({
@@ -355,6 +372,8 @@ export function useReactorX() {
             addEvent(`💸 Borrowed ${amount} ${symbol} | tx: ${hash.slice(0, 10)}...`);
             await publicClient?.waitForTransactionReceipt({ hash });
             addEvent(`✅ Borrow confirmed! ${symbol} added to your wallet.`);
+
+            await new Promise(r => setTimeout(r, 1000));
             await refreshAll();
             return hash;
         } catch (e: any) {

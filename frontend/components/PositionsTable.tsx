@@ -14,22 +14,22 @@ export default function PositionsTable({ positions, txLoading, onManualReact }: 
         <div className="card" style={{ overflow: "hidden" }}>
             {/* Header */}
             <div style={{
-                padding: "18px 24px",
-                borderBottom: "1px solid rgba(59,27,11,0.8)",
+                padding: "24px",
+                borderBottom: "1px solid rgba(139,92,246,0.1)",
                 display: "flex", justifyContent: "space-between", alignItems: "center",
-                background: "rgba(17,7,0,0.4)",
+                background: "rgba(139,92,246,0.03)",
             }}>
-                <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)" }}>
-                    📊 All Positions
+                <h2 style={{ fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-muted)" }}>
+                    📊 Active Positions
                 </h2>
                 <span className="badge badge-purple">{positions.length} active</span>
             </div>
 
             {positions.length === 0 ? (
-                <div style={{ padding: 48, textAlign: "center" }}>
-                    <div style={{ fontSize: 36, marginBottom: 12 }}>🏦</div>
-                    <div style={{ color: "var(--text-muted)", fontSize: 13 }}>
-                        No active positions. Deposit collateral to get started.
+                <div style={{ padding: 64, textAlign: "center" }}>
+                    <div className="ai-fab" style={{ position: "static", transform: "none", width: 64, height: 64, fontSize: 28, margin: "0 auto 20px" }}>🏛️</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 13, fontWeight: 600 }}>
+                        No active positions detected on Somnia.
                     </div>
                 </div>
             ) : (
@@ -38,11 +38,11 @@ export default function PositionsTable({ positions, txLoading, onManualReact }: 
                         <thead>
                             <tr>
                                 <th>User Address</th>
-                                <th>Collateral</th>
-                                <th>Debt</th>
+                                <th>Collateral ($)</th>
+                                <th>Debt ($)</th>
                                 <th>Health Factor</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -52,39 +52,39 @@ export default function PositionsTable({ positions, txLoading, onManualReact }: 
                                 const liquidatable = parseFloat(hf) < 1 && position.debt > 0n;
 
                                 return (
-                                    <tr key={user} className={liquidatable ? "highlight" : ""}>
+                                    <tr key={user} className={liquidatable ? "highlight-row" : ""}>
                                         <td>
                                             <a
                                                 href={`https://shannon-explorer.somnia.network/address/${user}`}
                                                 target="_blank" rel="noopener noreferrer"
-                                                style={{ color: "#f97316", textDecoration: "none" }}
+                                                className="sidebar-item"
+                                                style={{ padding: 0, color: "var(--reactor-cyan-light)" }}
                                             >
                                                 {user.slice(0, 8)}…{user.slice(-6)}
                                             </a>
                                         </td>
-                                        <td style={{ color: "#fde047" }}>
-                                            {parseFloat(formatEther(position.collateral)).toFixed(4)} ETH
+                                        <td style={{ color: "var(--reactor-cyan-light)", fontWeight: 700 }}>
+                                            ${parseFloat(formatEther(position.collateral)).toFixed(2)}
                                         </td>
-                                        <td style={{ color: "#fbbf24" }}>
-                                            {parseFloat(formatEther(position.debt)).toFixed(2)} USDC
+                                        <td style={{ color: "var(--reactor-purple-light)", fontWeight: 700 }}>
+                                            ${parseFloat(formatEther(position.debt)).toFixed(2)}
                                         </td>
-                                        <td style={{ color: status.color, fontWeight: 700 }}>{hf}</td>
+                                        <td style={{ color: status.color, fontWeight: 900, fontFamily: "JetBrains Mono" }}>{hf}</td>
                                         <td>
-                                            <span className={`badge ${status.cssClass}`}>{status.label}</span>
+                                            <span className={`badge ${status.cssClass}`} style={{ fontSize: 10 }}>{status.label}</span>
                                         </td>
                                         <td>
                                             {liquidatable ? (
                                                 <button
                                                     className="btn-danger"
-                                                    style={{ padding: "6px 12px", fontSize: 11 }}
+                                                    style={{ padding: "6px 12px", fontSize: 11, background: "var(--reactor-red)", color: "white" }}
                                                     onClick={() => onManualReact(user)}
                                                     disabled={txLoading}
-                                                    title="Manually trigger ReactorEngine"
                                                 >
-                                                    {txLoading ? <span className="spinner" style={{ width: 14, height: 14 }} /> : "⚡ React"}
+                                                    {txLoading ? <span className="spinner" style={{ width: 14, height: 14 }} /> : "FORCE REACT"}
                                                 </button>
                                             ) : (
-                                                <span style={{ color: "var(--text-muted)", fontSize: 12 }}>—</span>
+                                                <span style={{ color: "var(--text-muted)", fontSize: 12 }}>None</span>
                                             )}
                                         </td>
                                     </tr>

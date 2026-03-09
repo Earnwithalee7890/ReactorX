@@ -16,8 +16,8 @@ export default function EventLog({ events }: Props) {
                 <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)" }}>
                     📡 Real-Time Event Log
                 </h2>
-                <span className="badge badge-purple">
-                    <span className="dot-pulse purple" />
+                <span className="badge badge-cyan">
+                    <span className="dot-pulse cyan" />
                     WebSocket
                 </span>
             </div>

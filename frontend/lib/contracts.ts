@@ -3,22 +3,23 @@ import { parseAbi } from "viem";
 // Contract ABIs for ReactorX
 export const LENDING_MOCK_ABI = parseAbi([
     // Events
-    "event PositionUpdated(address indexed user, uint256 collateral, uint256 debt, uint256 healthFactor, uint256 timestamp)",
+    "event PositionUpdated(address indexed user, uint256 totalCollateralUsd, uint256 debt, uint256 healthFactor, uint256 timestamp)",
     "event PriceUpdated(uint256 oldPrice, uint256 newPrice, uint256 timestamp)",
-    "event PositionLiquidated(address indexed user, uint256 collateralSeized, uint256 debtCleared, uint256 timestamp)",
-    "event CollateralDeposited(address indexed user, uint256 amount, uint256 timestamp)",
-    "event AssetBorrowed(address indexed user, address token, uint256 amount, uint256 timestamp)",
-    "event AssetRepaid(address indexed user, address token, uint256 amount, uint256 timestamp)",
+    "event PositionLiquidated(address indexed user, uint256 collateralSeizedUsd, uint256 debtCleared, uint256 timestamp)",
+    "event CollateralDeposited(address indexed user, address indexed token, uint256 amount, uint256 timestamp)",
+    "event AssetBorrowed(address indexed user, address indexed token, uint256 amount, uint256 timestamp)",
+    "event AssetRepaid(address indexed user, address indexed token, uint256 amount, uint256 timestamp)",
     // View functions
     "function getHealthFactor(address user) view returns (uint256)",
-    "function getPosition(address user) view returns (uint256 collateral, uint256 debt, bool isActive)",
+    "function getPosition(address user) view returns (uint256 totalCollateralUsd, uint256 debt, bool isActive)",
     "function isLiquidatable(address user) view returns (bool)",
     "function collateralPrice() view returns (uint256)",
     "function liquidationThreshold() view returns (uint256)",
     "function getAllPositionHolders() view returns (address[])",
     "function reactorEngine() view returns (address)",
+    "function getCollateralBalance(address user, address token) view returns (uint256)",
     // Write functions
-    "function depositCollateral() payable",
+    "function depositCollateral(address token, uint256 amount) payable",
     "function borrow(address token, uint256 amount)",
     "function repay(address token, uint256 amount)",
     "function updatePrice(uint256 newPrice)",

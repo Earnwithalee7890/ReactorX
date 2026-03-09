@@ -8,13 +8,13 @@ export default function LiquidationFeed({ history }: Props) {
     return (
         <div className="card" style={{ overflow: "hidden" }}>
             <div style={{
-                padding: "18px 24px",
-                borderBottom: "1px solid rgba(59,27,11,0.8)",
+                padding: "24px",
+                borderBottom: "1px solid rgba(239,68,68,0.1)",
                 display: "flex", justifyContent: "space-between", alignItems: "center",
-                background: "rgba(17,7,0,0.4)",
+                background: "rgba(239,68,68,0.03)",
             }}>
-                <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)" }}>
-                    🔴 Live Liquidation Feed
+                <h2 style={{ fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-muted)" }}>
+                    🔴 Protocol Liquidation Log
                 </h2>
                 <span className="badge badge-red">
                     <span className="dot-pulse red" />
@@ -23,11 +23,11 @@ export default function LiquidationFeed({ history }: Props) {
             </div>
 
             {history.length === 0 ? (
-                <div style={{ padding: 48, textAlign: "center" }}>
-                    <div style={{ fontSize: 36, marginBottom: 12 }}>🎯</div>
-                    <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>
-                        No liquidations yet.<br />
-                        Simulate a price crash to trigger automatic liquidation.
+                <div style={{ padding: 64, textAlign: "center" }}>
+                    <div className="ai-fab" style={{ position: "static", transform: "none", width: 64, height: 64, fontSize: 28, margin: "0 auto 20px", background: "rgba(239,68,68,0.1)", color: "#ef4444" }}>🎯</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 13, fontWeight: 600, lineHeight: 1.6 }}>
+                        Current status: Solvent.<br />
+                        <span style={{ fontSize: 11, fontWeight: 400 }}>Trigger a price crash to see ReactorX in action.</span>
                     </div>
                 </div>
             ) : (
@@ -35,44 +35,33 @@ export default function LiquidationFeed({ history }: Props) {
                     <table className="reactor-table">
                         <thead>
                             <tr>
-                                <th>Time</th>
-                                <th>Liquidated User</th>
-                                <th>Collateral Seized</th>
-                                <th>Debt Cleared</th>
-                                <th>Reward (10%)</th>
+                                <th>Timestamp</th>
+                                <th>Subject</th>
+                                <th>Seized ($)</th>
+                                <th>Cleared ($)</th>
                                 <th>Executor</th>
-                                <th>Tx</th>
                             </tr>
                         </thead>
                         <tbody>
                             {history.map((r, i) => (
                                 <tr key={i} className="animate-slide-up">
-                                    <td style={{ color: "var(--text-muted)" }}>
+                                    <td style={{ color: "var(--text-muted)", fontSize: 12 }}>
                                         {new Date(Number(r.timestamp) * 1000).toLocaleTimeString()}
                                     </td>
-                                    <td style={{ color: "#f87171" }}>
+                                    <td style={{ color: "var(--reactor-red-bright)", fontWeight: 700 }}>
                                         {r.user.slice(0, 6)}…{r.user.slice(-4)}
                                     </td>
-                                    <td style={{ color: "#fde047" }}>
-                                        {parseFloat(formatEther(r.collateralSeized)).toFixed(4)} ETH
+                                    <td style={{ color: "var(--reactor-cyan-light)", fontWeight: 700 }}>
+                                        ${parseFloat(formatEther(r.collateralSeized)).toFixed(2)}
                                     </td>
-                                    <td style={{ color: "#fbbf24" }}>
-                                        {parseFloat(formatEther(r.debtCleared)).toFixed(2)} USDC
-                                    </td>
-                                    <td style={{ color: "#34d399" }}>
-                                        {parseFloat(formatEther(r.reward)).toFixed(6)} ETH
-                                    </td>
-                                    <td style={{ color: "#f97316" }}>
-                                        {r.executor.slice(0, 6)}…{r.executor.slice(-4)}
+                                    <td style={{ color: "var(--reactor-purple-light)", fontWeight: 700 }}>
+                                        ${parseFloat(formatEther(r.debtCleared)).toFixed(2)}
                                     </td>
                                     <td>
-                                        <a
-                                            href={`https://shannon-explorer.somnia.network/address/${r.user}`}
-                                            target="_blank" rel="noopener noreferrer"
-                                            style={{ color: "var(--text-muted)", fontSize: 12, textDecoration: "none" }}
-                                        >
-                                            ↗
-                                        </a>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                            <span style={{ fontSize: 10, padding: "2px 6px", background: "rgba(139,92,246,0.1)", borderRadius: 4, color: "var(--reactor-purple-light)" }}>SMN</span>
+                                            <span style={{ color: "var(--text-muted)", fontSize: 11 }}>Validator</span>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

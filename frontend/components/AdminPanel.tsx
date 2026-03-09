@@ -12,10 +12,10 @@ interface Props {
 }
 
 const PRICE_PRESETS = [
-    { label: "$2000 · Normal", value: "2000", color: "#34d399", emoji: "✅" },
-    { label: "$1200 · Drop", value: "1200", color: "#fbbf24", emoji: "📉" },
-    { label: "$800 · Crash", value: "800", color: "#f87171", emoji: "🔥" },
-    { label: "$500 · Nuke!", value: "500", color: "#ef4444", emoji: "💥" },
+    { label: "Stability ($2000)", value: "2000", color: "#10b981", emoji: "💎" },
+    { label: "Volatile ($1200)", value: "1200", color: "#f59e0b", emoji: "📉" },
+    { label: "Flash Crash ($800)", value: "800", color: "#ef4444", emoji: "🔥" },
+    { label: "System Nuke ($500)", value: "500", color: "#f43f5e", emoji: "💥" },
 ];
 
 export default function AdminPanel({ stats, txLoading, address, onUpdatePrice, onRegisterSubscription }: Props) {
@@ -23,109 +23,97 @@ export default function AdminPanel({ stats, txLoading, address, onUpdatePrice, o
     const currentPrice = stats ? `$${parseFloat(formatEther(stats.collateralPrice)).toFixed(2)}` : "—";
 
     return (
-        <div className="card card-shiny glow-border-gold" style={{ padding: 28 }}>
-            {/* Accent bar */}
-            <div className="stat-card-accent" style={{ background: "linear-gradient(90deg,#eab308,#ea580c,transparent)" }} />
-
-            <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)", marginBottom: 22 }}>
-                🎛️ Admin — Demo Controls
-            </h2>
-
-            {/* Current price display */}
-            <div style={{
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                padding: "12px 16px",
-                background: "rgba(234,179,8,0.07)",
-                border: "1px solid rgba(234,179,8,0.2)",
-                borderRadius: 12, marginBottom: 16,
-            }}>
-                <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Oracle Price (ETH/USD)</span>
-                <span style={{ fontFamily: "JetBrains Mono", fontSize: 22, fontWeight: 800, color: "#fde047" }}>
-                    {currentPrice}
-                </span>
+        <div className="card card-shiny" style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ padding: 24, borderBottom: "1px solid rgba(139,92,246,0.1)", background: "rgba(139,92,246,0.02)" }}>
+                <h2 style={{ fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-muted)" }}>
+                    🛰️ Protocol Simulator
+                </h2>
             </div>
 
-            {/* Price presets */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
-                {PRICE_PRESETS.map((p) => (
-                    <button
-                        key={p.value}
-                        onClick={() => setPrice(p.value)}
-                        style={{
-                            background: price === p.value ? `${p.color}18` : "rgba(17,7,0,0.8)",
-                            border: `1px solid ${price === p.value ? p.color + "60" : "rgba(59,27,11,0.8)"}`,
-                            color: p.color, borderRadius: 10,
-                            padding: "10px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer",
-                            transition: "all 0.2s", textAlign: "left",
-                            display: "flex", alignItems: "center", gap: 6,
-                        }}
-                    >
-                        <span>{p.emoji}</span> {p.label}
-                    </button>
-                ))}
-            </div>
-
-            {/* Custom price + simulate btn */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-                <input
-                    id="price-input"
-                    className="input-styled"
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="Custom price (USD)..."
-                    style={{ flex: 1 }}
-                />
-                <button
-                    id="update-price-btn"
-                    className="btn-danger"
-                    onClick={() => onUpdatePrice(price)}
-                    disabled={txLoading || !address}
-                    style={{ whiteSpace: "nowrap" }}
-                >
-                    {txLoading ? <span className="spinner" /> : "💥 Simulate"}
-                </button>
-            </div>
-
-            <div style={{
-                padding: "10px 14px",
-                background: "rgba(234,88,12,0.07)",
-                border: "1px solid rgba(234,88,12,0.2)",
-                borderRadius: 10, marginBottom: 20,
-            }}>
-                <p style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.7 }}>
-                    ⚡ Dropping the price causes <span className="code-chip">PositionUpdated</span> to emit.
-                    {" "}The subscribed <span className="code-chip">ReactorEngine</span> reacts <em>automatically</em> via Somnia validators — no bots needed.
-                </p>
-            </div>
-
-            {/* Subscription control */}
-            {!stats?.isSubscribed && (
+            <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
+                {/* Oracle Price Status */}
                 <div style={{
-                    borderTop: "1px solid rgba(59,27,11,0.8)",
-                    paddingTop: 20,
-                    display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12,
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "16px", background: "rgba(0,0,0,0.3)", borderRadius: 12, border: "1px solid rgba(139,92,246,0.1)"
                 }}>
                     <div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4 }}>
-                            Somnia Reactivity Subscription
-                        </div>
-                        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                            Not registered. Calls Precompile 0x0100 to subscribe.
-                        </div>
+                        <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700 }}>STT/USD ORACLE PULSE</div>
+                        <div style={{ fontSize: 24, fontWeight: 900, color: "var(--reactor-cyan)", fontFamily: "JetBrains Mono" }}>{currentPrice}</div>
                     </div>
+                    <div className="dot-pulse green"></div>
+                </div>
 
+                {/* Scenario Selection */}
+                <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8, display: "block" }}>Impact Scenarios</label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        {PRICE_PRESETS.map((p) => (
+                            <button
+                                key={p.value}
+                                onClick={() => setPrice(p.value)}
+                                style={{
+                                    background: price === p.value ? `${p.color}20` : "rgba(139,92,246,0.03)",
+                                    border: `1px solid ${price === p.value ? p.color : "rgba(139,92,246,0.1)"}`,
+                                    color: price === p.value ? "white" : "var(--text-muted)",
+                                    borderRadius: 10, padding: "12px", fontSize: 12, fontWeight: 700, cursor: "pointer",
+                                    transition: "all 0.2s", textAlign: "left", display: "flex", alignItems: "center", gap: 8
+                                }}
+                            >
+                                <span>{p.emoji}</span> {p.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Simulation Button */}
+                <div style={{ display: "flex", gap: 10 }}>
+                    <div style={{ flex: 1, position: "relative" }}>
+                        <input
+                            className="input-styled"
+                            type="number"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            style={{ paddingRight: 60 }}
+                        />
+                        <div style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 11, fontWeight: 700, color: "var(--text-muted)" }}>USD</div>
+                    </div>
                     <button
-                        id="register-subscription-btn"
-                        className="btn-primary"
-                        style={{ fontSize: 12, padding: "9px 16px", whiteSpace: "nowrap" }}
-                        onClick={onRegisterSubscription}
+                        className="btn-danger"
+                        onClick={() => onUpdatePrice(price)}
                         disabled={txLoading || !address}
+                        style={{ whiteSpace: "nowrap", padding: "0 24px" }}
                     >
-                        {txLoading ? <span className="spinner" /> : "🔔 Register"}
+                        {txLoading ? <span className="spinner" /> : "EXECUTE"}
                     </button>
                 </div>
-            )}
+
+                <div className="onboarding-step" style={{ padding: 14 }}>
+                    <p style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6 }}>
+                        💡 <strong>Simulation Note:</strong> Dropping the price below $1000 will likely trigger liquidations for high-leverage positions. On Somnia, these are handled by the validator set <em>instantly</em>.
+                    </p>
+                </div>
+
+                {/* Reactive Subscription Status */}
+                {stats && !stats.isSubscribed && (
+                    <div style={{ marginTop: 12, padding: 20, background: "rgba(234,179,8,0.05)", border: "1px solid rgba(234,179,8,0.2)", borderRadius: 12 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: "#fde047" }}>SUBSCRIPTION INACTIVE</div>
+                            <span className="dot-pulse yellow"></span>
+                        </div>
+                        <p style={{ fontSize: 11, color: "rgba(253,224,71,0.7)", marginBottom: 16 }}>
+                            ReactorEngine needs an active subscription to STT/USD price changes to work autonomously.
+                        </p>
+                        <button
+                            className="btn-primary"
+                            onClick={onRegisterSubscription}
+                            disabled={txLoading || !address}
+                            style={{ width: "100%", background: "#f59e0b", color: "black", boxShadow: "0 0 20px rgba(245,158,11,0.2)" }}
+                        >
+                            {txLoading ? <span className="spinner" /> : "REGISTER WITH PRECOMPILE"}
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

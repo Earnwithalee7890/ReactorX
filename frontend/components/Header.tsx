@@ -265,22 +265,22 @@ export default function Header() {
                         style={{
                             position: "relative", width: 42, height: 42,
                             borderRadius: 12,
-                            background: "linear-gradient(135deg,#ea580c,#eab308)",
+                            background: "linear-gradient(135deg, var(--reactor-purple), var(--reactor-cyan))",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            boxShadow: "0 0 24px rgba(234,88,12,0.6), 0 0 60px rgba(234,179,8,0.2)",
+                            boxShadow: "0 0 24px rgba(139,92,246,0.5), 0 0 60px rgba(6,182,212,0.1)",
                             flexShrink: 0,
                         }}
                     >
                         <Image
-                            src="/brand-logo.png"
+                            src="/logo.png"
                             alt="ReactorX"
-                            width={42}
-                            height={42}
-                            style={{ borderRadius: 12, objectFit: "cover" }}
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                            width={32}
+                            height={32}
+                            style={{ borderRadius: 6, objectFit: "contain" }}
+                            onError={(e) => { (e.target as HTMLImageElement).src = "/logo-new.png"; }}
                             priority
                         />
-                        <div style={{ position: "absolute", inset: -2, borderRadius: 14, border: "1px solid rgba(249,115,22,0.5)", pointerEvents: "none" }} />
+                        <div style={{ position: "absolute", inset: -2, borderRadius: 14, border: "1px solid rgba(139,92,246,0.4)", pointerEvents: "none" }} />
                     </div>
 
                     <div>

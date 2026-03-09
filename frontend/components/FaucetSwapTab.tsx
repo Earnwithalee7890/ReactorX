@@ -8,7 +8,7 @@ import { useToast } from "./ToastProvider";
 const TOKENS = [
     {
         symbol: "STT", address: "native", decimals: 18, type: "Native",
-        icon: "/logo-new.png", color: "#f59e0b"
+        icon: "https://somnia.network/favicon.ico", color: "#f59e0b"
     },
     {
         symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, decimals: 6, type: "ERC20",
@@ -193,7 +193,7 @@ export default function FaucetSwapTab() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 30, margin: "0 auto", maxWidth: 1100 }}>
                 {/* ─── FAUCET PANEL ─── */}
                 <div className="card card-shiny" style={{ padding: 32 }}>
-                    <div className="stat-card-accent" style={{ background: "linear-gradient(90deg, #3b82f6, #06b6d4, transparent)" }} />
+                    <div className="stat-card-accent" style={{ background: "linear-gradient(90deg, var(--reactor-purple), var(--reactor-cyan), transparent)" }} />
                     <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>💧 Token Faucet</h2>
                     <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 30, lineHeight: 1.6 }}>
                         Get 1,000 mock tokens every 24 hours to test borrowing, pooling, and liquidations.
@@ -228,7 +228,7 @@ export default function FaucetSwapTab() {
 
                 {/* ─── AMM SWAP PANEL ─── */}
                 <div className="card card-shiny" style={{ padding: 32 }}>
-                    <div className="stat-card-accent" style={{ background: "linear-gradient(90deg, #8b5cf6, #d946ef, transparent)" }} />
+                    <div className="stat-card-accent" style={{ background: "linear-gradient(90deg, var(--reactor-cyan), var(--reactor-purple), transparent)" }} />
                     <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>🔄 Reactor AMM</h2>
                     <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 30, lineHeight: 1.6 }}>
                         Swap between assets instantly using our fixed-price demo AMM.
@@ -307,7 +307,7 @@ export default function FaucetSwapTab() {
                     </div>
 
                     <button
-                        className="btn-purple"
+                        className="btn-primary"
                         onClick={handleSwap}
                         disabled={!!loadingMsg || !amountIn || fromToken.symbol === toToken.symbol || !isConnected}
                         style={{ width: "100%", marginTop: 24, padding: "20px", fontSize: 16, fontWeight: 800, borderRadius: 16 }}

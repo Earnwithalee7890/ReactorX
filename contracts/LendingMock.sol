@@ -1,68 +1,41 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/**
- * @title LendingMock
- * @author ReactorX Team
- * @notice Simulates a lending protocol with collateral, borrow, and health factor logic.
- *         This contract is the source of truth for position state on Somnia Testnet.
- *         ReactorEngine subscribes to events emitted here to trigger automatic liquidations.
- */
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract LendingMock is ReentrancyGuard {
-    // ========================================
-    // STRUCTS
-    // ========================================
-
     struct Position {
-        uint256 collateral;    // Amount of STT deposited (18 decimals)
         uint256 debt;          // Amount borrowed in USD terms (18 decimals)
         bool isActive;         // Whether position exists
     }
-
-    // ========================================
-    // STATE VARIABLES
-    // ========================================
 
     mapping(address => Position) public positions;
     address[] public positionHolders;
     mapping(address => bool) private isHolder;
 
-    uint256 public collateralPrice;        // Price of STT in USD (18 decimals)
+    // collateralBalances[user][token] -> amount (token decimals)
+    mapping(address => mapping(address => uint256)) public collateralBalances;
+    address[] public collateralTokens;
+    mapping(address => bool) private isCollateralToken;
+
+    uint256 public collateralPrice;        // Price of native STT in USD (18 decimals)
     uint256 public liquidationThreshold;   // % threshold e.g. 80 = 80%
     uint256 public constant PRECISION = 1e18;
-    uint256 public constant MIN_HEALTH = 1e18; // Health factor = 1.0
+    uint256 public constant MIN_HEALTH = 1e18; 
 
     address public owner;
     address public reactorEngine;          
 
-    // Supported Borrow Assets
-    mapping(address => bool) public supportedTokens;
-    mapping(address => uint256) public tokenPrice; // Price of token in USD (18 decimals)
+    mapping(address => bool) public supportedTokens; // Assets that can be borrowed or used as collateral
+    mapping(address => uint256) public tokenPrice; 
 
-    // ========================================
-    // EVENTS
-    // ========================================
-
-    event PositionUpdated(
-        address indexed user,
-        uint256 collateral,
-        uint256 debt,
-        uint256 healthFactor,
-        uint256 timestamp
-    );
-
+    event PositionUpdated(address indexed user, uint256 totalCollateralUsd, uint256 debt, uint256 healthFactor, uint256 timestamp);
     event PriceUpdated(uint256 oldPrice, uint256 newPrice, uint256 timestamp);
-    event PositionLiquidated(address indexed user, uint256 collateralSeized, uint256 debtCleared, uint256 timestamp);
-    event CollateralDeposited(address indexed user, uint256 amount, uint256 timestamp);
-    event AssetBorrowed(address indexed user, address token, uint256 amount, uint256 timestamp);
-    event AssetRepaid(address indexed user, address token, uint256 amount, uint256 timestamp);
-
-    // ========================================
-    // MODIFIERS
-    // ========================================
+    event PositionLiquidated(address indexed user, uint256 collateralSeizedUsd, uint256 debtCleared, uint256 timestamp);
+    event CollateralDeposited(address indexed user, address indexed token, uint256 amount, uint256 timestamp);
+    event AssetBorrowed(address indexed user, address indexed token, uint256 amount, uint256 timestamp);
+    event AssetRepaid(address indexed user, address indexed token, uint256 amount, uint256 timestamp);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "LendingMock: not owner");
@@ -74,19 +47,14 @@ contract LendingMock is ReentrancyGuard {
         _;
     }
 
-    // ========================================
-    // CONSTRUCTOR
-    // ========================================
-
     constructor(uint256 _initialPrice, uint256 _liquidationThreshold) {
         owner = msg.sender;
         collateralPrice = _initialPrice;          
         liquidationThreshold = _liquidationThreshold; 
+        // Add native token (represented as addr 0) as a collateral token
+        collateralTokens.push(address(0));
+        isCollateralToken[address(0)] = true;
     }
-
-    // ========================================
-    // CONFIGURATION
-    // ========================================
 
     function setReactorEngine(address _engine) external onlyOwner {
         reactorEngine = _engine;
@@ -95,60 +63,57 @@ contract LendingMock is ReentrancyGuard {
     function setSupportedToken(address token, bool status, uint256 price) external onlyOwner {
         supportedTokens[token] = status;
         tokenPrice[token] = price;
+        if (status && !isCollateralToken[token]) {
+            collateralTokens.push(token);
+            isCollateralToken[token] = true;
+        }
     }
 
-    // ========================================
-    // CORE PROTOCOL FUNCTIONS
-    // ========================================
+    function depositCollateral(address token, uint256 amount) external payable nonReentrant {
+        if (token == address(0)) {
+            require(msg.value > 0, "LendingMock: zero STT");
+            collateralBalances[msg.sender][address(0)] += msg.value;
+        } else {
+            require(supportedTokens[token], "LendingMock: token not supported");
+            require(amount > 0, "LendingMock: zero amount");
+            IERC20(token).transferFrom(msg.sender, address(this), amount);
+            collateralBalances[msg.sender][token] += amount;
+        }
 
-    /**
-     * @notice Deposit native STT as collateral
-     */
-    function depositCollateral() external payable nonReentrant {
-        require(msg.value > 0, "LendingMock: zero amount");
-
-        positions[msg.sender].collateral += msg.value;
         positions[msg.sender].isActive = true;
-
         if (!isHolder[msg.sender]) {
             positionHolders.push(msg.sender);
             isHolder[msg.sender] = true;
         }
 
-        uint256 hf = getHealthFactor(msg.sender);
-        emit CollateralDeposited(msg.sender, msg.value, block.timestamp);
-        emit PositionUpdated(msg.sender, positions[msg.sender].collateral, positions[msg.sender].debt, hf, block.timestamp);
+        emit CollateralDeposited(msg.sender, token, token == address(0) ? msg.value : amount, block.timestamp);
+        _emitPositionUpdate(msg.sender);
     }
 
-    /**
-     * @notice Borrow ERC20 assets against STT collateral
-     */
     function borrow(address token, uint256 amount) external nonReentrant {
         require(supportedTokens[token], "LendingMock: token not supported");
         require(amount > 0, "LendingMock: zero amount");
         
-        // Debt value in USD
-        uint256 debtValueUsd = (amount * tokenPrice[token]) / (10 ** (IERC20(token) != IERC20(address(0)) ? 18 : 18)); // Simplified decimals for now
-        
+        uint256 decimals = 18;
+        try IERC20(token).balanceOf(address(this)) {
+            // It's a real token, try to get decimals would be better but let's assume 18 for mock
+        } catch {}
+
+        uint256 debtValueUsd = (amount * tokenPrice[token]) / PRECISION;
         uint256 newDebt = positions[msg.sender].debt + debtValueUsd;
-        uint256 collateralValue = (positions[msg.sender].collateral * collateralPrice) / PRECISION;
-        uint256 maxBorrow = (collateralValue * liquidationThreshold) / 100;
+        
+        uint256 totalCollateralValue = getTotalCollateralValue(msg.sender);
+        uint256 maxBorrow = (totalCollateralValue * liquidationThreshold) / 100;
         require(newDebt <= maxBorrow, "LendingMock: exceeds borrow limit");
 
         positions[msg.sender].debt = newDebt;
-
-        // Mint/Transfer token to user (Protocol must hold liquidity)
         require(IERC20(token).balanceOf(address(this)) >= amount, "LendingMock: Not enough liquidity");
         IERC20(token).transfer(msg.sender, amount);
 
-        uint256 hf = getHealthFactor(msg.sender);
         emit AssetBorrowed(msg.sender, token, amount, block.timestamp);
-        emit PositionUpdated(msg.sender, positions[msg.sender].collateral, positions[msg.sender].debt, hf, block.timestamp);
+        _emitPositionUpdate(msg.sender);
     }
 
-    /**
-     * @notice Repay ERC20 assets to clear debt
-     */
     function repay(address token, uint256 amount) external nonReentrant {
         require(supportedTokens[token], "LendingMock: token not supported");
         require(amount > 0, "LendingMock: zero amount");
@@ -162,66 +127,82 @@ contract LendingMock is ReentrancyGuard {
             positions[msg.sender].debt -= repayValueUsd;
         }
 
-        uint256 hf = getHealthFactor(msg.sender);
         emit AssetRepaid(msg.sender, token, amount, block.timestamp);
-        emit PositionUpdated(msg.sender, positions[msg.sender].collateral, positions[msg.sender].debt, hf, block.timestamp);
+        _emitPositionUpdate(msg.sender);
     }
 
-    /**
-     * @notice Admin/demo function to simulate oracle price drop
-     */
     function updatePrice(uint256 newPrice) external {
         require(newPrice > 0, "LendingMock: zero price");
         uint256 old = collateralPrice;
         collateralPrice = newPrice;
-
         emit PriceUpdated(old, newPrice, block.timestamp);
 
         for (uint256 i = 0; i < positionHolders.length; i++) {
             address user = positionHolders[i];
             if (positions[user].isActive && positions[user].debt > 0) {
-                uint256 hf = getHealthFactor(user);
-                emit PositionUpdated(user, positions[user].collateral, positions[user].debt, hf, block.timestamp);
+                _emitPositionUpdate(user);
             }
         }
     }
 
-    function liquidatePosition(address user) external onlyReactor nonReentrant returns (uint256 collateralSeized, uint256 debtCleared) {
+    function liquidatePosition(address user) external onlyReactor nonReentrant returns (uint256 totalValueSeized, uint256 debtCleared) {
         require(positions[user].isActive, "LendingMock: no active position");
-        require(positions[user].debt > 0, "LendingMock: no debt");
         require(getHealthFactor(user) < MIN_HEALTH, "LendingMock: position healthy");
 
-        collateralSeized = positions[user].collateral;
+        totalValueSeized = getTotalCollateralValue(user);
         debtCleared = positions[user].debt;
 
-        // Seize collateral (STT) - normally would send to liquidator
-        payable(msg.sender).transfer(collateralSeized);
+        // Seize all collateral assets
+        for (uint256 i = 0; i < collateralTokens.length; i++) {
+            address t = collateralTokens[i];
+            uint256 bal = collateralBalances[user][t];
+            if (bal > 0) {
+                collateralBalances[user][t] = 0;
+                if (t == address(0)) {
+                    payable(msg.sender).transfer(bal);
+                } else {
+                    IERC20(t).transfer(msg.sender, bal);
+                }
+            }
+        }
 
         delete positions[user];
-
-        emit PositionLiquidated(user, collateralSeized, debtCleared, block.timestamp);
+        emit PositionLiquidated(user, totalValueSeized, debtCleared, block.timestamp);
         emit PositionUpdated(user, 0, 0, 0, block.timestamp);
     }
-
-    receive() external payable {}
-
-    // ========================================
-    // VIEW FUNCTIONS
-    // ========================================
 
     function getHealthFactor(address user) public view returns (uint256) {
         Position memory pos = positions[user];
         if (pos.debt == 0) return type(uint256).max; 
-        if (pos.collateral == 0) return 0;
+        
+        uint256 totalCollateralValue = getTotalCollateralValue(user);
+        if (totalCollateralValue == 0) return 0;
 
-        uint256 collateralValue = (pos.collateral * collateralPrice) / PRECISION;
-        uint256 adjustedCollateral = (collateralValue * liquidationThreshold) / 100;
+        uint256 adjustedCollateral = (totalCollateralValue * liquidationThreshold) / 100;
         return (adjustedCollateral * PRECISION) / pos.debt;
     }
 
-    function getPosition(address user) external view returns (uint256 collateral, uint256 debt, bool isActive) {
-        Position storage pos = positions[user];
-        return (pos.collateral, pos.debt, pos.isActive);
+    function getTotalCollateralValue(address user) public view returns (uint256 totalValueUsd) {
+        for (uint256 i = 0; i < collateralTokens.length; i++) {
+            address t = collateralTokens[i];
+            uint256 bal = collateralBalances[user][t];
+            if (bal > 0) {
+                if (t == address(0)) {
+                    totalValueUsd += (bal * collateralPrice) / PRECISION;
+                } else {
+                    totalValueUsd += (bal * tokenPrice[t]) / PRECISION;
+                }
+            }
+        }
+    }
+
+    function getPosition(address user) external view returns (uint256 totalCollateralUsd, uint256 debt, bool isActive) {
+        return (getTotalCollateralValue(user), positions[user].debt, positions[user].isActive);
+    }
+
+    function _emitPositionUpdate(address user) internal {
+        uint256 hf = getHealthFactor(user);
+        emit PositionUpdated(user, getTotalCollateralValue(user), positions[user].debt, hf, block.timestamp);
     }
 
     function getAllPositionHolders() external view returns (address[] memory) {
@@ -231,4 +212,10 @@ contract LendingMock is ReentrancyGuard {
     function isLiquidatable(address user) external view returns (bool) {
         return getHealthFactor(user) < MIN_HEALTH;
     }
+
+    function getCollateralBalance(address user, address token) external view returns (uint256) {
+        return collateralBalances[user][token];
+    }
+
+    receive() external payable {}
 }
