@@ -17,6 +17,7 @@ import FaucetSwapTab from "@/components/FaucetSwapTab";
 import Sidebar from "@/components/Sidebar";
 import AIAssistant from "@/components/AIAssistant";
 import SettingsTab from "@/components/SettingsTab";
+import Footer from "@/components/Footer";
 import { useReactorX } from "@/hooks/useReactorX";
 
 export default function Home() {
@@ -193,15 +194,7 @@ export default function Home() {
             {/* SETTINGS */}
             {tab === "settings" && <SettingsTab />}
 
-            <footer style={{ marginTop: 80, padding: "40px 0", borderTop: "1px solid rgba(139,92,246,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                © 2026 ReactorX Protocol · Built for Somnia Mini Hackathon
-              </div>
-              <div style={{ display: "flex", gap: 20 }}>
-                <a href="https://shannon-explorer.somnia.network" target="_blank" className="sidebar-item" style={{ padding: 0, fontSize: 11 }}>Explorer ↗</a>
-                <a href="https://testnet.somnia.network" target="_blank" className="sidebar-item" style={{ padding: 0, fontSize: 11 }}>Faucet ↗</a>
-              </div>
-            </footer>
+            <Footer />
           </main>
         </div>
 
