@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
@@ -29,8 +29,30 @@ export default function Home() {
     position, allPositions, liquidationHistory, stats,
     loading, txLoading, error, recentEvents,
     depositCollateral, borrow, repay, updatePrice, manualReact,
-    registerSubscription, checkIn, setupProtocol, refreshAll,
+    registerSubscription, checkIn, setupProtocol, refreshAll, lastCheckIn,
   } = useReactorX();
+
+  const [countdown, setCountdown] = useState<string>("");
+
+  useEffect(() => {
+    if (!lastCheckIn) return;
+
+    const tick = () => {
+      const remaining = (lastCheckIn + 24 * 60 * 60 * 1000) - Date.now();
+      if (remaining <= 0) {
+        setCountdown("");
+        return;
+      }
+      const h = Math.floor(remaining / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      setCountdown(`${h}h ${m}m ${s}s`);
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [lastCheckIn]);
 
   // Expose setupProtocol to window for the Admin button
   if (typeof window !== "undefined") {
@@ -95,10 +117,10 @@ export default function Home() {
                         onClick={async () => {
                           try { await checkIn(); } catch (e) { }
                         }}
-                        disabled={txLoading}
-                        style={{ padding: "18px 36px", fontSize: 16 }}
+                        disabled={txLoading || !!countdown}
+                        style={{ padding: "18px 36px", fontSize: 16, minWidth: 200 }}
                       >
-                        {txLoading ? "Checking in..." : "💰 Daily Check-in"}
+                        {txLoading ? "Checking in..." : countdown ? `⏱️ Wait ${countdown}` : "💰 Daily Check-in"}
                       </button>
                       <button className="btn-secondary" onClick={() => refreshAll()} style={{ padding: "18px 36px", fontSize: 16 }}>↻ Sync Terminal</button>
                     </div>

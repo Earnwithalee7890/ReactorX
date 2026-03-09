@@ -97,6 +97,7 @@ export function useReactorX() {
     const [mockSubscribed, setMockSubscribed] = useState(false);
     const [mockReactions, setMockReactions] = useState(0n);
     const [mockLiquidations, setMockLiquidations] = useState(0n);
+    const [lastCheckIn, setLastCheckIn] = useState<number>(0);
 
     // Track previous address to detect wallet changes
     const prevAddressRef = useRef<string | undefined>(undefined);
@@ -140,6 +141,10 @@ export function useReactorX() {
         // Load subscription status for this specific wallet
         const saved = localStorage.getItem(getMockSubKey(address));
         setMockSubscribed(saved === "true");
+
+        // Load last check-in time
+        const lastCheck = localStorage.getItem(`reactorx_last_checkin_${address.toLowerCase()}`);
+        if (lastCheck) setLastCheckIn(parseInt(lastCheck));
     }, [address, addEvent]);
 
     // ── Fetch protocol stats ──────────────────────────────────────────────
@@ -705,6 +710,12 @@ export function useReactorX() {
             await publicClient?.waitForTransactionReceipt({ hash });
             addEvent(`✨ Daily rewards delivered to your secure vault.`);
 
+            const now = Date.now();
+            setLastCheckIn(now);
+            if (address) {
+                localStorage.setItem(`reactorx_last_checkin_${address.toLowerCase()}`, now.toString());
+            }
+
             await refreshAll();
             return hash;
         } catch (e: any) {
@@ -778,6 +789,7 @@ export function useReactorX() {
         checkIn,
         setupProtocol,
         refreshAll,
+        lastCheckIn,
     };
 }
 
