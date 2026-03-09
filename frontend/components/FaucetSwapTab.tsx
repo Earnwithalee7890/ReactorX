@@ -6,14 +6,26 @@ import { CONTRACT_ADDRESSES, REACTOR_DEX_ABI, MOCK_TOKEN_ABI } from "@/lib/contr
 import { useToast } from "./ToastProvider";
 
 const TOKENS = [
-    { symbol: "STT", address: "native", decimals: 18, type: "Native", icon: "💎", color: "#f59e0b" },
-    { symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, decimals: 18, type: "ERC20", icon: "💵", color: "#2775ca" },
-    { symbol: "USDT", address: CONTRACT_ADDRESSES.usdt, decimals: 18, type: "ERC20", icon: "💳", color: "#26a17b" },
-    { symbol: "WETH", address: CONTRACT_ADDRESSES.weth, decimals: 18, type: "ERC20", icon: "⟠", color: "#627eea" },
+    {
+        symbol: "STT", address: "native", decimals: 18, type: "Native",
+        icon: "https://somnia.network/favicon.ico", color: "#f59e0b"
+    },
+    {
+        symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, decimals: 18, type: "ERC20",
+        icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png", color: "#2775ca"
+    },
+    {
+        symbol: "USDT", address: CONTRACT_ADDRESSES.usdt, decimals: 18, type: "ERC20",
+        icon: "https://cryptologos.cc/logos/tether-usdt-logo.png", color: "#26a17b"
+    },
+    {
+        symbol: "WETH", address: CONTRACT_ADDRESSES.weth, decimals: 18, type: "ERC20",
+        icon: "https://cryptologos.cc/logos/ethereum-eth-logo.png", color: "#627eea"
+    },
 ];
 
 export default function FaucetSwapTab() {
-    const { address } = useAccount();
+    const { address, isConnected } = useAccount();
     const { data: walletClient } = useWalletClient();
     const publicClient = usePublicClient();
     const { addToast } = useToast();
@@ -23,6 +35,7 @@ export default function FaucetSwapTab() {
     const [fromToken, setFromToken] = useState(TOKENS[0]);
     const [toToken, setToToken] = useState(TOKENS[1]);
     const [amountIn, setAmountIn] = useState("");
+    const [amountOut, setAmountOut] = useState("");
 
     const fetchBalances = async () => {
         if (!address || !publicClient) return;
@@ -41,13 +54,61 @@ export default function FaucetSwapTab() {
                 newBals[t.address] = formatUnits(bal as bigint, t.decimals);
             }
             setBalances(newBals);
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Balance fetch error:", err); }
     };
 
-    useEffect(() => { fetchBalances(); const inv = setInterval(fetchBalances, 10000); return () => clearInterval(inv); }, [address, publicClient]);
+    const getEstimate = async () => {
+        if (!publicClient || !amountIn || isNaN(Number(amountIn)) || Number(amountIn) <= 0) {
+            setAmountOut("");
+            return;
+        }
+        try {
+            const dexAddr = CONTRACT_ADDRESSES.dex;
+            if (!dexAddr) return;
+
+            // Fetch current oracle prices from DEX
+            const sttPrice = await publicClient.readContract({
+                address: dexAddr, abi: REACTOR_DEX_ABI, functionName: "sttPrice"
+            }) as bigint;
+
+            const getPrice = async (t: typeof TOKENS[0]) => {
+                if (t.type === "Native") return sttPrice;
+                return await publicClient.readContract({
+                    address: dexAddr, abi: REACTOR_DEX_ABI, functionName: "tokenPrices",
+                    args: [t.address as `0x${string}`]
+                }) as bigint;
+            };
+
+            const pIn = await getPrice(fromToken);
+            const pOut = await getPrice(toToken);
+
+            if (pIn > 0n && pOut > 0n) {
+                const valIn = parseUnits(amountIn, fromToken.decimals);
+                const valUsd = (valIn * pIn) / parseUnits("1", 18);
+                const valOut = (valUsd * parseUnits("1", 18)) / pOut;
+                setAmountOut(parseFloat(formatUnits(valOut, toToken.decimals)).toFixed(4));
+            }
+        } catch (e) {
+            console.error("Simulation error:", e);
+            setAmountOut("Error");
+        }
+    };
+
+    useEffect(() => {
+        fetchBalances();
+        const inv = setInterval(fetchBalances, 10000);
+        return () => clearInterval(inv);
+    }, [address, publicClient]);
+
+    useEffect(() => {
+        getEstimate();
+    }, [amountIn, fromToken, toToken, publicClient]);
 
     const handleMint = async (tokenAddress: string, symbol: string) => {
-        if (!walletClient || !publicClient) return;
+        if (!walletClient || !publicClient) {
+            addToast("Please connect your wallet first", "error");
+            return;
+        }
         try {
             setLoadingMsg(`Claiming ${symbol}...`);
             const hash = await walletClient.writeContract({
@@ -55,15 +116,16 @@ export default function FaucetSwapTab() {
                 abi: MOCK_TOKEN_ABI,
                 functionName: "faucet",
             });
-            addToast(`Minting 1,000 ${symbol}...`, "info");
+            addToast(`Minting 1,000 ${symbol}... TX sent`, "info");
             await publicClient.waitForTransactionReceipt({ hash });
-            addToast(`Claimed 1,000 ${symbol}`, "success");
+            addToast(`Successfully claimed 1,000 ${symbol}!`, "success");
             fetchBalances();
         } catch (e: any) {
-            if (e.message.includes("wait 24h")) {
-                addToast(`Come back in 24 hours.`, "error");
+            console.error(e);
+            if (e.message?.includes("wait 24h")) {
+                addToast(`Faucet limit reached. Come back in 24h.`, "error");
             } else {
-                addToast("Transaction failed or rejected.", "error");
+                addToast("Transaction failed. Check your STT balance for gas.", "error");
             }
         } finally { setLoadingMsg(null); }
     };
@@ -71,50 +133,58 @@ export default function FaucetSwapTab() {
     const handleSwap = async () => {
         if (!walletClient || !publicClient || !amountIn) return;
         try {
-            setLoadingMsg(`Processing Swap...`);
+            setLoadingMsg(`Swapping ${fromToken.symbol} to ${toToken.symbol}...`);
             const dexAddr = CONTRACT_ADDRESSES.dex;
-            if (!dexAddr) throw new Error("DEX Address not configured");
+            if (!dexAddr || dexAddr === "undefined") throw new Error("DEX Address not found");
 
+            let hash;
             if (fromToken.type === "Native" && toToken.type === "ERC20") {
                 const val = parseEther(amountIn);
-                const hash = await walletClient.writeContract({
+                hash = await walletClient.writeContract({
                     address: dexAddr, abi: REACTOR_DEX_ABI, functionName: "swapSttForToken",
                     args: [toToken.address as `0x${string}`], value: val,
                 });
-                await publicClient.waitForTransactionReceipt({ hash });
             } else if (fromToken.type === "ERC20" && toToken.type === "Native") {
                 const val = parseUnits(amountIn, fromToken.decimals);
+                // Approval
+                setLoadingMsg(`Approving ${fromToken.symbol}...`);
                 const appHash = await walletClient.writeContract({
                     address: fromToken.address as `0x${string}`, abi: MOCK_TOKEN_ABI,
                     functionName: "approve", args: [dexAddr, val],
                 });
-                setLoadingMsg(`Approving ${fromToken.symbol}...`);
                 await publicClient.waitForTransactionReceipt({ hash: appHash });
+                // Swap
                 setLoadingMsg(`Executing Swap...`);
-                const hash = await walletClient.writeContract({
+                hash = await walletClient.writeContract({
                     address: dexAddr, abi: REACTOR_DEX_ABI, functionName: "swapTokenForStt",
                     args: [fromToken.address as `0x${string}`, val],
                 });
-                await publicClient.waitForTransactionReceipt({ hash });
             } else if (fromToken.type === "ERC20" && toToken.type === "ERC20") {
                 const val = parseUnits(amountIn, fromToken.decimals);
+                // Approval
+                setLoadingMsg(`Approving ${fromToken.symbol}...`);
                 const appHash = await walletClient.writeContract({
                     address: fromToken.address as `0x${string}`, abi: MOCK_TOKEN_ABI,
                     functionName: "approve", args: [dexAddr, val],
                 });
-                setLoadingMsg(`Approving ${fromToken.symbol}...`);
                 await publicClient.waitForTransactionReceipt({ hash: appHash });
+                // Swap
                 setLoadingMsg(`Executing Swap...`);
-                const hash = await walletClient.writeContract({
+                hash = await walletClient.writeContract({
                     address: dexAddr, abi: REACTOR_DEX_ABI, functionName: "swapTokenForToken",
                     args: [fromToken.address as `0x${string}`, toToken.address as `0x${string}`, val],
                 });
-                await publicClient.waitForTransactionReceipt({ hash });
             }
-            addToast(`Swapped ${amountIn} ${fromToken.symbol} to ${toToken.symbol}`, "success");
+
+            if (hash) {
+                addToast(`Swap submitted! Finalizing...`, "info");
+                await publicClient.waitForTransactionReceipt({ hash });
+                addToast(`Successfully swapped to ${toToken.symbol}`, "success");
+            }
             fetchBalances(); setAmountIn("");
         } catch (e: any) {
-            addToast(e.shortMessage || "Check logs", "error");
+            console.error(e);
+            addToast(e.shortMessage || "Swap failed. Check slippage/gas.", "error");
         } finally { setLoadingMsg(null); }
     };
 
@@ -133,7 +203,9 @@ export default function FaucetSwapTab() {
                         {TOKENS.filter(t => t.type === "ERC20").map((token) => (
                             <div key={token.symbol} className="onboarding-step" style={{ padding: '16px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 15, flex: 1 }}>
-                                    <span style={{ fontSize: 28 }}>{token.icon}</span>
+                                    <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                        <img src={token.icon} alt={token.symbol} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                    </div>
                                     <div>
                                         <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>{token.symbol}</div>
                                         <div style={{ fontSize: 12, color: "var(--text-muted)", fontFamily: 'JetBrains Mono' }}>
@@ -144,10 +216,10 @@ export default function FaucetSwapTab() {
                                 <button
                                     className="btn-primary"
                                     onClick={() => handleMint(token.address, token.symbol)}
-                                    disabled={!!loadingMsg}
+                                    disabled={!!loadingMsg || !isConnected}
                                     style={{ padding: "10px 18px", fontSize: 12, fontWeight: 700 }}
                                 >
-                                    Claim
+                                    {loadingMsg && loadingMsg.includes(token.symbol) ? "..." : "Claim"}
                                 </button>
                             </div>
                         ))}
@@ -172,14 +244,19 @@ export default function FaucetSwapTab() {
                                 </span>
                             </div>
                             <div style={{ display: "flex", gap: 12, alignItems: 'center' }}>
-                                <select
-                                    className="input-styled"
-                                    value={fromToken.symbol}
-                                    onChange={(e) => setFromToken(TOKENS.find(t => t.symbol === e.target.value)!)}
-                                    style={{ width: 110, fontSize: 14, fontWeight: 700, height: 48 }}
-                                >
-                                    {TOKENS.map(t => <option key={t.symbol} value={t.symbol}>{t.icon} {t.symbol}</option>)}
-                                </select>
+                                <div style={{ position: 'relative', width: 110 }}>
+                                    <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 20, height: 20 }}>
+                                        <img src={fromToken.icon} style={{ width: '100%' }} />
+                                    </div>
+                                    <select
+                                        className="input-styled"
+                                        value={fromToken.symbol}
+                                        onChange={(e) => setFromToken(TOKENS.find(t => t.symbol === e.target.value)!)}
+                                        style={{ width: '100%', fontSize: 14, fontWeight: 700, height: 48, paddingLeft: 35 }}
+                                    >
+                                        {TOKENS.map(t => <option key={t.symbol} value={t.symbol}>{t.symbol}</option>)}
+                                    </select>
+                                </div>
                                 <input
                                     type="number"
                                     placeholder="0.00"
@@ -203,24 +280,28 @@ export default function FaucetSwapTab() {
                         {/* TO */}
                         <div>
                             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, marginTop: 10 }}>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)" }}>RECEIVE</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)" }}>RECEIVE (SIMULATED)</span>
+                                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                                    Target: {toToken.symbol}
+                                </span>
                             </div>
                             <div style={{ display: "flex", gap: 12, alignItems: 'center' }}>
-                                <select
-                                    className="input-styled"
-                                    value={toToken.symbol}
-                                    onChange={(e) => setToToken(TOKENS.find(t => t.symbol === e.target.value)!)}
-                                    style={{ width: 110, fontSize: 14, fontWeight: 700, height: 48 }}
-                                >
-                                    {TOKENS.map(t => <option key={t.symbol} value={t.symbol}>{t.icon} {t.symbol}</option>)}
-                                </select>
-                                <input
-                                    type="text"
-                                    placeholder="Estimated"
-                                    disabled
-                                    className="input-styled"
-                                    style={{ flex: 1, fontSize: 24, fontWeight: 800, textAlign: 'right', border: 'none', background: 'transparent', opacity: 0.4 }}
-                                />
+                                <div style={{ position: 'relative', width: 110 }}>
+                                    <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 20, height: 20 }}>
+                                        <img src={toToken.icon} style={{ width: '100%' }} />
+                                    </div>
+                                    <select
+                                        className="input-styled"
+                                        value={toToken.symbol}
+                                        onChange={(e) => setToToken(TOKENS.find(t => t.symbol === e.target.value)!)}
+                                        style={{ width: '100%', fontSize: 14, fontWeight: 700, height: 48, paddingLeft: 35 }}
+                                    >
+                                        {TOKENS.map(t => <option key={t.symbol} value={t.symbol}>{t.symbol}</option>)}
+                                    </select>
+                                </div>
+                                <div style={{ flex: 1, fontSize: 24, fontWeight: 800, textAlign: 'right', color: amountOut ? "var(--text-primary)" : "var(--text-muted)" }}>
+                                    {amountOut || "0.00"}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -228,10 +309,10 @@ export default function FaucetSwapTab() {
                     <button
                         className="btn-purple"
                         onClick={handleSwap}
-                        disabled={!!loadingMsg || !amountIn || fromToken.symbol === toToken.symbol}
+                        disabled={!!loadingMsg || !amountIn || fromToken.symbol === toToken.symbol || !isConnected}
                         style={{ width: "100%", marginTop: 24, padding: "20px", fontSize: 16, fontWeight: 800, borderRadius: 16 }}
                     >
-                        {loadingMsg ? <span><span className="spinner" /> {loadingMsg}</span> : "Swap Assets"}
+                        {!isConnected ? "Connect Wallet" : loadingMsg ? <span><span className="spinner" /> {loadingMsg}</span> : "Swap Assets"}
                     </button>
                     {fromToken.symbol === toToken.symbol && (
                         <div style={{ color: "#f87171", fontSize: 11, marginTop: 12, textAlign: "center", fontWeight: 600 }}>Switch target token to swap</div>
