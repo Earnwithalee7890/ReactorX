@@ -153,7 +153,9 @@ body {
 }
 
 /* ═══════════════════════════════════════════════╗
-   ANIMATED BACKGROUND SYSTEM                    ║
+   ANIMATED BACKGROUND SYSTEM (OPTIMIZED)        ║
+   - Removed heavy blur filters                  -
+   - Added will-change for GPU acceleration      -
 ═══════════════════════════════════════════════╝ */
 
 .bg-magma {
@@ -168,155 +170,88 @@ body {
 .bg-magma::before {
   content: "";
   position: absolute;
-  top: -10%;
-  left: -10%;
-  width: 120%;
-  height: 120%;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
   background:
-    radial-gradient(circle at 20% 30%, rgba(129, 140, 248, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.05) 0%, transparent 40%);
-  filter: blur(100px);
-  animation: bg-shift 30s ease-in-out infinite alternate;
+    radial-gradient(circle at 20% 30%, rgba(129, 140, 248, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.03) 0%, transparent 50%);
+  animation: bg-shift 60s linear infinite;
+  will-change: transform;
 }
 
 @keyframes bg-shift {
-  0% {
-    transform: rotate(0deg) scale(1);
+  from {
+    transform: rotate(0deg);
   }
 
-  100% {
-    transform: rotate(5deg) scale(1.1);
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Animated grid */
+/* Static grid to reduce repaint */
 .bg-grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(139, 92, 246, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.08) 1px, transparent 1px);
-  background-size: 64px 64px;
-  animation: grid-drift 20s linear infinite;
+    linear-gradient(rgba(139, 92, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  /* Removed drift animation to save CPU */
 }
 
-@keyframes grid-drift {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(64px);
-  }
-}
-
-/* Radial glow orbs */
+/* Simplified orbs */
 .orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  animation: orb-float 8s ease-in-out infinite;
+  opacity: 0.4;
+  will-change: transform;
+  filter: blur(40px);
+  /* Lowered blur radius */
 }
 
 .orb-1 {
-  width: 700px;
-  height: 700px;
-  top: -200px;
-  left: -150px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
-  animation-delay: 0s;
+  width: 600px;
+  height: 600px;
+  top: -100px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  animation: orb-float 20s ease-in-out infinite;
 }
 
 .orb-2 {
-  width: 500px;
-  height: 500px;
-  bottom: -100px;
-  right: -100px;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, transparent 70%);
-  animation-delay: -4s;
-}
-
-.orb-3 {
-  width: 300px;
-  height: 300px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(234, 88, 12, 0.06) 0%, transparent 70%);
-  animation-delay: -2s;
+  width: 400px;
+  height: 400px;
+  bottom: -50px;
+  right: -50px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+  animation: orb-float 25s ease-in-out infinite reverse;
 }
 
 @keyframes orb-float {
 
   0%,
   100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0);
   }
 
-  33% {
-    transform: translate(20px, -30px) scale(1.05);
-  }
-
-  66% {
-    transform: translate(-15px, 20px) scale(0.95);
+  50% {
+    transform: translate(30px, 15px);
   }
 }
 
-/* Scanning line */
-.scan-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
-  animation: scan 6s linear infinite;
-}
-
-@keyframes scan {
-  0% {
-    top: -2px;
-    opacity: 0;
-  }
-
-  5% {
-    opacity: 1;
-  }
-
-  95% {
-    opacity: 0.3;
-  }
-
-  100% {
-    top: 100vh;
-    opacity: 0;
-  }
-}
-
-/* Particle dots */
+/* Particle dots simplified */
 .particles {
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(1px 1px at 10% 20%, rgba(139, 92, 246, 0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 30% 80%, rgba(6, 182, 212, 0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 60% 30%, rgba(139, 92, 246, 0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 80% 60%, rgba(6, 182, 212, 0.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 15% 55%, rgba(249, 115, 22, 0.5) 0%, transparent 100%),
-    radial-gradient(2px 2px at 70% 10%, rgba(253, 224, 71, 0.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 90% 40%, rgba(234, 88, 12, 0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 45% 70%, rgba(249, 115, 22, 0.3) 0%, transparent 100%);
-  animation: particles-drift 15s linear infinite alternate;
-}
-
-@keyframes particles-drift {
-  0% {
-    transform: translate(0, 0);
-  }
-
-  100% {
-    transform: translate(-20px, -30px);
-  }
+    radial-gradient(1px 1px at 10% 20%, rgba(139, 92, 246, 0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 60%, rgba(6, 182, 212, 0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 70%, rgba(249, 115, 22, 0.2) 0%, transparent 100%);
+  opacity: 0.5;
 }
 
 /* ═══════════════════════════════════════════════╗

@@ -664,7 +664,7 @@ export function useReactorX() {
     // ── Auto-refresh on load and interval ─────────────────────────────────
     useEffect(() => {
         refreshAll();
-        const interval = setInterval(refreshAll, 15000); // 15s interval (was 10s — less spammy)
+        const interval = setInterval(refreshAll, 30000); // 30s interval for better performance
         return () => clearInterval(interval);
     }, [refreshAll]);
 
