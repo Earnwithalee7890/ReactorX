@@ -33,12 +33,6 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                            <div style={{
-                                width: 36, height: 36, borderRadius: 10,
-                                background: "linear-gradient(135deg, var(--reactor-gold), #d97706)",
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                fontSize: 18, fontWeight: 900, color: "#000"
-                            }}>⚡</div>
                             <span style={{ fontSize: 18, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em" }}>
                                 Reactor<span style={{ color: "var(--reactor-gold)" }}>X</span>
                             </span>
