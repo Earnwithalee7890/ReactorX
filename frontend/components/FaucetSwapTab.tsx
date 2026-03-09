@@ -11,16 +11,16 @@ const TOKENS = [
         icon: "https://somnia.network/favicon.ico", color: "#f59e0b"
     },
     {
-        symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, decimals: 18, type: "ERC20",
-        icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png", color: "#2775ca"
+        symbol: "USDC", address: CONTRACT_ADDRESSES.usdc, decimals: 6, type: "ERC20",
+        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png", color: "#2775ca"
     },
     {
-        symbol: "USDT", address: CONTRACT_ADDRESSES.usdt, decimals: 18, type: "ERC20",
-        icon: "https://cryptologos.cc/logos/tether-usdt-logo.png", color: "#26a17b"
+        symbol: "USDT", address: CONTRACT_ADDRESSES.usdt, decimals: 6, type: "ERC20",
+        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png", color: "#26a17b"
     },
     {
         symbol: "WETH", address: CONTRACT_ADDRESSES.weth, decimals: 18, type: "ERC20",
-        icon: "https://cryptologos.cc/logos/ethereum-eth-logo.png", color: "#627eea"
+        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png", color: "#627eea"
     },
 ];
 
@@ -84,8 +84,8 @@ export default function FaucetSwapTab() {
 
             if (pIn > 0n && pOut > 0n) {
                 const valIn = parseUnits(amountIn, fromToken.decimals);
-                const valUsd = (valIn * pIn) / parseUnits("1", 18);
-                const valOut = (valUsd * parseUnits("1", 18)) / pOut;
+                const valUsd = (valIn * pIn) / parseUnits("1", fromToken.decimals);
+                const valOut = (valUsd * parseUnits("1", toToken.decimals)) / pOut;
                 setAmountOut(parseFloat(formatUnits(valOut, toToken.decimals)).toFixed(4));
             }
         } catch (e) {
