@@ -27,6 +27,63 @@
   --radius-md: 14px;
 }
 
+/* ── Light Theme ─────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #e2e8f0;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --bg-border: rgba(0, 0, 0, 0.08);
+  --bg-border-bright: rgba(0, 0, 0, 0.15);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --reactor-gold: #d97706;
+  --reactor-purple: #6366f1;
+}
+
+[data-theme="light"] body {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .sidebar {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-right-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .sidebar-item {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .sidebar-item.active {
+  background: rgba(251, 191, 36, 0.12) !important;
+  color: #92400e !important;
+}
+
+[data-theme="light"] .bg-main::before {
+  opacity: 0.03 !important;
+}
+
+[data-theme="light"] .ai-fab {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="light"] .input-styled {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .Health-bar-container {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] select option {
+  background: #fff !important;
+  color: #0f172a !important;
+}
+
 *,
 *::before,
 *::after {

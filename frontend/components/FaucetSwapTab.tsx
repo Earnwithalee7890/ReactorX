@@ -8,19 +8,23 @@ import { useToast } from "./ToastProvider";
 const TOKENS = [
     {
         symbol: "STT", address: "native", decimals: 18, type: "Native",
-        icon: "https://somnia.network/favicon.ico", color: "#f59e0b"
+        icon: "https://somnia.network/favicon.ico", color: "#fbbf24",
+        desc: "Native gas token"
     },
     {
         symbol: "USDC", address: CONTRACT_ADDRESSES.usdc || "0x7a9dcF9Bb88535C3Eba3bE8FAE4DDF0bF514c2eC", decimals: 18, type: "ERC20",
-        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png", color: "#2775ca"
+        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png",
+        color: "#2775ca", desc: "USD Coin (Mock)"
     },
     {
         symbol: "USDT", address: CONTRACT_ADDRESSES.usdt || "0xE2E35A81135688A394eC0186Ed707A907D2Bf2e4", decimals: 18, type: "ERC20",
-        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png", color: "#26a17b"
+        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",
+        color: "#26a17b", desc: "Tether USD (Mock)"
     },
     {
         symbol: "WETH", address: CONTRACT_ADDRESSES.weth || "0xF5A764C94ae8Aa62b48AbE2eb66b060A2252C355", decimals: 18, type: "ERC20",
-        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png", color: "#627eea"
+        icon: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
+        color: "#627eea", desc: "Wrapped Ether (Mock)"
     },
 ];
 
@@ -66,7 +70,6 @@ export default function FaucetSwapTab() {
             const dexAddr = CONTRACT_ADDRESSES.dex;
             if (!dexAddr) return;
 
-            // Fetch current oracle prices from DEX
             const sttPrice = await publicClient.readContract({
                 address: dexAddr, abi: REACTOR_DEX_ABI, functionName: "sttPrice"
             }) as bigint;
@@ -136,7 +139,7 @@ export default function FaucetSwapTab() {
             setLoadingMsg(`Swapping ${fromToken.symbol} to ${toToken.symbol}...`);
             const dexAddr = CONTRACT_ADDRESSES.dex || "0xE213403699406bA58f2f16F94b94BB83a4490024";
             if (!dexAddr || dexAddr === "0x0000000000000000000000000000000000000000") {
-                throw new Error("DEX Address not found. Please refresh or update ENV.");
+                throw new Error("DEX Address not found.");
             }
 
             let hash;
@@ -148,14 +151,12 @@ export default function FaucetSwapTab() {
                 });
             } else if (fromToken.type === "ERC20" && toToken.type === "Native") {
                 const val = parseUnits(amountIn, fromToken.decimals);
-                // Approval
                 setLoadingMsg(`Approving ${fromToken.symbol}...`);
                 const appHash = await walletClient.writeContract({
                     address: fromToken.address as `0x${string}`, abi: MOCK_TOKEN_ABI,
                     functionName: "approve", args: [dexAddr, val],
                 });
                 await publicClient.waitForTransactionReceipt({ hash: appHash });
-                // Swap
                 setLoadingMsg(`Executing Swap...`);
                 hash = await walletClient.writeContract({
                     address: dexAddr, abi: REACTOR_DEX_ABI, functionName: "swapTokenForStt",
@@ -163,14 +164,12 @@ export default function FaucetSwapTab() {
                 });
             } else if (fromToken.type === "ERC20" && toToken.type === "ERC20") {
                 const val = parseUnits(amountIn, fromToken.decimals);
-                // Approval
                 setLoadingMsg(`Approving ${fromToken.symbol}...`);
                 const appHash = await walletClient.writeContract({
                     address: fromToken.address as `0x${string}`, abi: MOCK_TOKEN_ABI,
                     functionName: "approve", args: [dexAddr, val],
                 });
                 await publicClient.waitForTransactionReceipt({ hash: appHash });
-                // Swap
                 setLoadingMsg(`Executing Swap...`);
                 hash = await walletClient.writeContract({
                     address: dexAddr, abi: REACTOR_DEX_ABI, functionName: "swapTokenForToken",
@@ -191,134 +190,279 @@ export default function FaucetSwapTab() {
     };
 
     return (
-        <div className="page-pad">
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 30, margin: "0 auto", maxWidth: 1100 }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }}>
                 {/* ─── DAILY REWARDS PANEL ─── */}
-                <div className="card card-shiny" style={{ padding: 32 }}>
-                    <div className="stat-card-accent" style={{ background: "linear-gradient(90deg, var(--reactor-purple), var(--reactor-cyan), transparent)" }} />
-                    <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>💰 Daily Rewards</h2>
-                    <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 30, lineHeight: 1.6 }}>
-                        Check-in daily to receive 1,000 mock tokens for testing and liquidity provision.
-                    </p>
+                <div style={{
+                    borderRadius: 24, overflow: "hidden",
+                    background: "linear-gradient(135deg, rgba(2,6,23,0.95), rgba(15,23,42,0.8))",
+                    border: "1px solid rgba(251,191,36,0.1)",
+                    boxShadow: "0 8px 40px rgba(0,0,0,0.3)"
+                }}>
+                    {/* Header */}
+                    <div style={{
+                        padding: "24px 28px", borderBottom: "1px solid rgba(251,191,36,0.08)",
+                        background: "linear-gradient(135deg, rgba(251,191,36,0.06), transparent)"
+                    }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            <div style={{
+                                width: 40, height: 40, borderRadius: 12,
+                                background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)",
+                                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20
+                            }}>🎁</div>
+                            <div>
+                                <h2 style={{ fontSize: 18, fontWeight: 900, color: "#fff", margin: 0 }}>Daily Rewards</h2>
+                                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>
+                                    Claim 1,000 mock tokens every 24h
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    {/* Token List */}
+                    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
                         {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map((token) => (
-                            <div key={token.symbol} className="onboarding-step" style={{ padding: '16px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 15, flex: 1 }}>
-                                    <div style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.05)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                        <img src={token.icon} alt={token.symbol} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            <div key={token.symbol} style={{
+                                display: "flex", alignItems: "center", justifyContent: "space-between",
+                                padding: "16px 18px", borderRadius: 16,
+                                background: "rgba(255,255,255,0.02)",
+                                border: "1px solid rgba(255,255,255,0.06)",
+                                transition: "all 0.2s"
+                            }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                                    <div style={{
+                                        width: 44, height: 44, borderRadius: "50%",
+                                        overflow: "hidden", background: "rgba(255,255,255,0.05)",
+                                        border: `2px solid ${token.color}30`,
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        flexShrink: 0
+                                    }}>
+                                        <img src={token.icon} alt={token.symbol} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>{token.symbol}</div>
-                                        <div style={{ fontSize: 12, color: "var(--text-muted)", fontFamily: 'JetBrains Mono' }}>
-                                            Bal: {balances[token.address] ? parseFloat(balances[token.address]).toLocaleString() : "0"}
+                                        <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{token.symbol}</div>
+                                        <div style={{
+                                            fontSize: 12, color: "rgba(255,255,255,0.4)",
+                                            fontFamily: "'JetBrains Mono', monospace"
+                                        }}>
+                                            {balances[token.address]
+                                                ? parseFloat(balances[token.address]).toLocaleString(undefined, { maximumFractionDigits: 2 })
+                                                : "0.00"}
                                         </div>
                                     </div>
                                 </div>
-                                <button
-                                    className="btn-primary"
-                                    onClick={() => handleMint(token.address, token.symbol)}
-                                    disabled={!!loadingMsg || !isConnected}
-                                    style={{ padding: "10px 18px", fontSize: 12, fontWeight: 700 }}
-                                >
-                                    {loadingMsg && loadingMsg.includes(token.symbol) ? "..." : "Claim"}
-                                </button>
+
+                                {token.type === "Native" ? (
+                                    <a
+                                        href="https://testnet.somnia.network"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            padding: "10px 20px", borderRadius: 12,
+                                            background: `${token.color}15`,
+                                            border: `1px solid ${token.color}30`,
+                                            color: token.color, fontSize: 12, fontWeight: 800,
+                                            textDecoration: "none", cursor: "pointer",
+                                            letterSpacing: "0.04em",
+                                            transition: "all 0.2s"
+                                        }}
+                                    >
+                                        Get STT ↗
+                                    </a>
+                                ) : (
+                                    <button
+                                        onClick={() => handleMint(token.address, token.symbol)}
+                                        disabled={!!loadingMsg || !isConnected}
+                                        style={{
+                                            padding: "10px 22px", borderRadius: 12,
+                                            background: loadingMsg?.includes(token.symbol)
+                                                ? "rgba(255,255,255,0.05)"
+                                                : `linear-gradient(135deg, ${token.color}20, ${token.color}10)`,
+                                            border: `1px solid ${token.color}40`,
+                                            color: token.color, fontSize: 12, fontWeight: 800,
+                                            cursor: (!!loadingMsg || !isConnected) ? "not-allowed" : "pointer",
+                                            opacity: (!!loadingMsg && !loadingMsg.includes(token.symbol)) ? 0.5 : 1,
+                                            letterSpacing: "0.04em",
+                                            transition: "all 0.2s",
+                                            fontFamily: "'Space Grotesk', sans-serif"
+                                        }}
+                                    >
+                                        {loadingMsg?.includes(token.symbol) ? (
+                                            <span className="spinner" style={{ width: 14, height: 14 }} />
+                                        ) : (
+                                            `Claim 1K`
+                                        )}
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>
                 </div>
 
                 {/* ─── AMM SWAP PANEL ─── */}
-                <div className="card card-shiny" style={{ padding: 32 }}>
-                    <div className="stat-card-accent" style={{ background: "linear-gradient(90deg, var(--reactor-cyan), var(--reactor-purple), transparent)" }} />
-                    <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>🔄 Reactor AMM</h2>
-                    <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 30, lineHeight: 1.6 }}>
-                        Swap between assets instantly using our fixed-price demo AMM.
-                    </p>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "rgba(0,0,0,0.3)", padding: 20, borderRadius: 20, border: "1px solid rgba(255,255,255,0.08)" }}>
-                        {/* FROM */}
-                        <div style={{ marginBottom: 10 }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)" }}>PAY</span>
-                                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                                    Available: {balances[fromToken.address] ? parseFloat(balances[fromToken.address]).toFixed(6) : "0"}
-                                </span>
-                            </div>
-                            <div style={{ display: "flex", gap: 12, alignItems: 'center' }}>
-                                <div style={{ position: 'relative', width: 110 }}>
-                                    <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 20, height: 20 }}>
-                                        <img src={fromToken.icon} style={{ width: '100%' }} />
-                                    </div>
-                                    <select
-                                        className="input-styled"
-                                        value={fromToken.symbol}
-                                        onChange={(e) => setFromToken(TOKENS.find(t => t.symbol === e.target.value)!)}
-                                        style={{ width: '100%', fontSize: 14, fontWeight: 700, height: 48, paddingLeft: 35 }}
-                                    >
-                                        {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map(t => <option key={t.symbol} value={t.symbol}>{t.symbol}</option>)}
-                                    </select>
-                                </div>
-                                <input
-                                    type="number"
-                                    placeholder="0.00"
-                                    className="input-styled"
-                                    value={amountIn}
-                                    onChange={(e) => setAmountIn(e.target.value)}
-                                    style={{ flex: 1, fontSize: 24, fontWeight: 800, textAlign: 'right', border: 'none', background: 'transparent' }}
-                                />
-                            </div>
-                        </div>
-
-                        <div style={{ display: "flex", justifyContent: "center", margin: "-12px 0" }}>
-                            <button
-                                onClick={() => { const t = fromToken; setFromToken(toToken); setToToken(t); }}
-                                style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", padding: "8px 12px", cursor: "pointer", color: "var(--text-secondary)", zIndex: 2 }}
-                            >
-                                ↓
-                            </button>
-                        </div>
-
-                        {/* TO */}
-                        <div>
-                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, marginTop: 10 }}>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)" }}>RECEIVE (SIMULATED)</span>
-                                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                                    Target: {toToken.symbol}
-                                </span>
-                            </div>
-                            <div style={{ display: "flex", gap: 12, alignItems: 'center' }}>
-                                <div style={{ position: 'relative', width: 110 }}>
-                                    <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 20, height: 20 }}>
-                                        <img src={toToken.icon} style={{ width: '100%' }} />
-                                    </div>
-                                    <select
-                                        className="input-styled"
-                                        value={toToken.symbol}
-                                        onChange={(e) => setToToken(TOKENS.find(t => t.symbol === e.target.value)!)}
-                                        style={{ width: '100%', fontSize: 14, fontWeight: 700, height: 48, paddingLeft: 35 }}
-                                    >
-                                        {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map(t => <option key={t.symbol} value={t.symbol}>{t.symbol}</option>)}
-                                    </select>
-                                </div>
-                                <div style={{ flex: 1, fontSize: 24, fontWeight: 800, textAlign: 'right', color: amountOut ? "var(--text-primary)" : "var(--text-muted)" }}>
-                                    {amountOut || "0.00"}
+                <div style={{
+                    borderRadius: 24, overflow: "hidden",
+                    background: "linear-gradient(135deg, rgba(2,6,23,0.95), rgba(15,23,42,0.8))",
+                    border: "1px solid rgba(139,92,246,0.12)",
+                    boxShadow: "0 8px 40px rgba(0,0,0,0.3)",
+                    display: "flex", flexDirection: "column"
+                }}>
+                    {/* Header */}
+                    <div style={{
+                        padding: "24px 28px", borderBottom: "1px solid rgba(139,92,246,0.08)",
+                        background: "linear-gradient(135deg, rgba(139,92,246,0.06), transparent)"
+                    }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            <div style={{
+                                width: 40, height: 40, borderRadius: 12,
+                                background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)",
+                                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20
+                            }}>🔄</div>
+                            <div>
+                                <h2 style={{ fontSize: 18, fontWeight: 900, color: "#fff", margin: 0 }}>Reactor AMM</h2>
+                                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>
+                                    Fixed-price oracle swap
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button
-                        className="btn-primary"
-                        onClick={handleSwap}
-                        disabled={!!loadingMsg || !amountIn || fromToken.symbol === toToken.symbol || !isConnected}
-                        style={{ width: "100%", marginTop: 24, padding: "20px", fontSize: 16, fontWeight: 800, borderRadius: 16 }}
-                    >
-                        {!isConnected ? "Connect Wallet" : loadingMsg ? <span><span className="spinner" /> {loadingMsg}</span> : "Swap Assets"}
-                    </button>
-                    {fromToken.symbol === toToken.symbol && (
-                        <div style={{ color: "#f87171", fontSize: 11, marginTop: 12, textAlign: "center", fontWeight: 600 }}>Switch target token to swap</div>
-                    )}
+                    {/* Swap Interface */}
+                    <div style={{ padding: "20px 24px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                        <div style={{
+                            background: "rgba(0,0,0,0.3)", borderRadius: 18,
+                            border: "1px solid rgba(255,255,255,0.06)", padding: 20,
+                            display: "flex", flexDirection: "column", gap: 4
+                        }}>
+                            {/* FROM */}
+                            <div>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                                    <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em" }}>PAY</span>
+                                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
+                                        Bal: {balances[fromToken.address] ? parseFloat(balances[fromToken.address]).toFixed(4) : "0"}
+                                    </span>
+                                </div>
+                                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                                    <div style={{
+                                        display: "flex", alignItems: "center", gap: 8,
+                                        background: "rgba(255,255,255,0.05)", borderRadius: 12,
+                                        padding: "8px 12px", border: "1px solid rgba(255,255,255,0.08)",
+                                        minWidth: 120
+                                    }}>
+                                        <img src={fromToken.icon} style={{ width: 24, height: 24, borderRadius: "50%" }} />
+                                        <select
+                                            value={fromToken.symbol}
+                                            onChange={(e) => setFromToken(TOKENS.find(t => t.symbol === e.target.value)!)}
+                                            style={{
+                                                background: "transparent", border: "none", color: "#fff",
+                                                fontSize: 14, fontWeight: 700, cursor: "pointer", outline: "none",
+                                                fontFamily: "'Space Grotesk', sans-serif"
+                                            }}
+                                        >
+                                            {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map(t =>
+                                                <option key={t.symbol} value={t.symbol} style={{ background: "#0f172a" }}>{t.symbol}</option>
+                                            )}
+                                        </select>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        placeholder="0.00"
+                                        value={amountIn}
+                                        onChange={(e) => setAmountIn(e.target.value)}
+                                        style={{
+                                            flex: 1, background: "transparent", border: "none",
+                                            color: "#fff", fontSize: 26, fontWeight: 800,
+                                            textAlign: "right", outline: "none",
+                                            fontFamily: "'JetBrains Mono', monospace"
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Swap Direction */}
+                            <div style={{ display: "flex", justifyContent: "center", margin: "4px 0" }}>
+                                <button
+                                    onClick={() => { const t = fromToken; setFromToken(toToken); setToToken(t); }}
+                                    style={{
+                                        width: 36, height: 36, borderRadius: 10,
+                                        background: "rgba(139,92,246,0.1)",
+                                        border: "1px solid rgba(139,92,246,0.3)",
+                                        cursor: "pointer", color: "#a78bfa",
+                                        fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center",
+                                        transition: "all 0.2s"
+                                    }}
+                                >↕</button>
+                            </div>
+
+                            {/* TO */}
+                            <div>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                                    <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em" }}>RECEIVE</span>
+                                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
+                                        Target: {toToken.symbol}
+                                    </span>
+                                </div>
+                                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                                    <div style={{
+                                        display: "flex", alignItems: "center", gap: 8,
+                                        background: "rgba(255,255,255,0.05)", borderRadius: 12,
+                                        padding: "8px 12px", border: "1px solid rgba(255,255,255,0.08)",
+                                        minWidth: 120
+                                    }}>
+                                        <img src={toToken.icon} style={{ width: 24, height: 24, borderRadius: "50%" }} />
+                                        <select
+                                            value={toToken.symbol}
+                                            onChange={(e) => setToToken(TOKENS.find(t => t.symbol === e.target.value)!)}
+                                            style={{
+                                                background: "transparent", border: "none", color: "#fff",
+                                                fontSize: 14, fontWeight: 700, cursor: "pointer", outline: "none",
+                                                fontFamily: "'Space Grotesk', sans-serif"
+                                            }}
+                                        >
+                                            {TOKENS.filter(t => t.address && (t.address as any) !== "undefined").map(t =>
+                                                <option key={t.symbol} value={t.symbol} style={{ background: "#0f172a" }}>{t.symbol}</option>
+                                            )}
+                                        </select>
+                                    </div>
+                                    <div style={{
+                                        flex: 1, fontSize: 26, fontWeight: 800, textAlign: "right",
+                                        color: amountOut && amountOut !== "Error" ? "#fff" : "rgba(255,255,255,0.2)",
+                                        fontFamily: "'JetBrains Mono', monospace"
+                                    }}>
+                                        {amountOut || "0.00"}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Swap Button */}
+                        <button
+                            onClick={handleSwap}
+                            disabled={!!loadingMsg || !amountIn || fromToken.symbol === toToken.symbol || !isConnected}
+                            style={{
+                                width: "100%", marginTop: 20, padding: "18px", fontSize: 15,
+                                fontWeight: 800, borderRadius: 14, border: "none",
+                                cursor: (!!loadingMsg || !amountIn || fromToken.symbol === toToken.symbol || !isConnected) ? "not-allowed" : "pointer",
+                                background: "linear-gradient(135deg, var(--reactor-purple), #6d28d9)",
+                                color: "#fff",
+                                boxShadow: "0 4px 20px rgba(139,92,246,0.3)",
+                                opacity: (!!loadingMsg || !amountIn || !isConnected) ? 0.5 : 1,
+                                fontFamily: "'Space Grotesk', sans-serif",
+                                transition: "all 0.3s ease"
+                            }}
+                        >
+                            {!isConnected ? "Connect Wallet" : loadingMsg ? (
+                                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                                    <span className="spinner" style={{ width: 16, height: 16 }} /> {loadingMsg}
+                                </span>
+                            ) : "Swap Assets"}
+                        </button>
+                        {fromToken.symbol === toToken.symbol && (
+                            <div style={{ color: "#f87171", fontSize: 11, marginTop: 10, textAlign: "center", fontWeight: 600 }}>
+                                Select different tokens to swap
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

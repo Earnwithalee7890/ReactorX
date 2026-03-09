@@ -45,7 +45,7 @@ export default function Home() {
         <Header />
 
         <div className="platform-layout" style={{ flex: 1, overflow: "hidden" }}>
-          <Sidebar activeTab={tab} onTabChange={setTab} />
+          <Sidebar activeTab={tab} onTabChange={setTab} position={position} />
 
           <main className="content-main" style={{ overflowY: "auto", position: "relative" }}>
             <NetworkBanner />
