@@ -298,21 +298,6 @@ export function useReactorX() {
         }
     }
 
-    // ── Atomic State Refresh ──────────────────────────────────────────────
-    const refreshAll = useCallback(async () => {
-        setLoading(true);
-        try {
-            await Promise.all([
-                fetchStats(),
-                fetchAllPositions(),
-                fetchLiquidationHistory(),
-                address ? fetchPosition(address) : Promise.resolve(),
-            ]);
-        } finally {
-            setLoading(false);
-        }
-    }, [fetchStats, fetchAllPositions, fetchLiquidationHistory, fetchPosition, address]);
-
     // ── Write: Deposit Collateral ──────────────────────────────────────────
     const depositCollateral = useCallback(async (tokenAddr: string, amount: string, symbol: string) => {
         setTxLoading(true);
