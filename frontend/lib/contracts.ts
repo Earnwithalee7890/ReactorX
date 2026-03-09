@@ -24,6 +24,7 @@ export const LENDING_MOCK_ABI = parseAbi([
     "function repay(address token, uint256 amount)",
     "function updatePrice(uint256 newPrice)",
     "function setReactorEngine(address engine)",
+    "function setSupportedToken(address token, bool status, uint256 price)",
 ]);
 
 export const REACTOR_ENGINE_ABI = parseAbi([

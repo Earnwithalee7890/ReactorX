@@ -298,6 +298,21 @@ export function useReactorX() {
         }
     }
 
+    // ── Atomic State Refresh ──────────────────────────────────────────────
+    const refreshAll = useCallback(async () => {
+        setLoading(true);
+        try {
+            await Promise.all([
+                fetchStats(),
+                fetchAllPositions(),
+                fetchLiquidationHistory(),
+                address ? fetchPosition(address) : Promise.resolve(),
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    }, [fetchStats, fetchAllPositions, fetchLiquidationHistory, fetchPosition, address]);
+
     // ── Write: Deposit Collateral ──────────────────────────────────────────
     const depositCollateral = useCallback(async (tokenAddr: string, amount: string, symbol: string) => {
         setTxLoading(true);
@@ -334,11 +349,10 @@ export function useReactorX() {
 
             addEvent(`⬆️ Deposited ${amount} ${symbol} | tx: ${hash.slice(0, 10)}...`);
             await publicClient?.waitForTransactionReceipt({ hash });
-            addEvent(`✅ Deposit confirmed on-chain!`);
+            addEvent(`✅ Deposit confirmed! COLLATERAL SYNCED.`);
 
-            // Critical: wait a bit for RPC consistency
-            await new Promise(r => setTimeout(r, 1000));
-            await refreshAll();
+            // Critical: Force a refresh after a small delay for Somnia's block time
+            setTimeout(() => refreshAll(), 2000);
             return hash;
         } catch (e: any) {
             const msg = parseContractError(e);
@@ -663,6 +677,89 @@ export function useReactorX() {
         }
     }, [address, publicClient, fetchPosition]);
 
+    // ── Write: Daily Check-in (Omni-Faucet) ───────────────────────────────
+    const checkIn = useCallback(async () => {
+        setTxLoading(true);
+        setError(null);
+        try {
+            requireWallet();
+            const tokens = [
+                { addr: CONTRACT_ADDRESSES.usdc, sym: "USDC" },
+                { addr: CONTRACT_ADDRESSES.usdt, sym: "USDT" },
+                { addr: CONTRACT_ADDRESSES.weth, sym: "WETH" },
+            ];
+
+            // 1. Check for Gas (STT)
+            const sttBal = await publicClient?.getBalance({ address: address! });
+            if (sttBal !== undefined && sttBal < parseEther("0.1")) {
+                setError("⛽ Low Gas! Please get STT from the official Somnia Faucet first.");
+                window.open("https://testnet.somnia.network", "_blank");
+                return;
+            }
+
+            addEvent("🚀 Initiating Somnia Daily Check-in...");
+            const primaryToken = tokens[0];
+            if (!primaryToken.addr) throw new Error("Reward token address missing.");
+            addEvent(`⏳ Signing check-in for 100 ${primaryToken.sym} rewards...`);
+
+            const hash = await walletClient!.writeContract({
+                address: primaryToken.addr as `0x${string}`,
+                abi: MOCK_TOKEN_ABI,
+                functionName: "faucet",
+            });
+
+            addEvent(`✅ Check-in recorded! TX: ${hash.slice(0, 10)}...`);
+            await publicClient?.waitForTransactionReceipt({ hash });
+            addEvent(`✨ Daily rewards delivered to your secure vault.`);
+
+            await refreshAll();
+            return hash;
+        } catch (e: any) {
+            const msg = parseContractError(e);
+            if (msg.includes("wait 24h")) {
+                setError("⏱️ Already checked in today! Come back in 24 hours.");
+            } else {
+                setError(msg);
+            }
+            throw new Error(msg);
+        } finally {
+            setTxLoading(false);
+        }
+    }, [walletClient, address, publicClient, refreshAll, addEvent]);
+
+    // ── Contract Setup & Support ──────────────────────────────────────────
+    const setupProtocol = useCallback(async () => {
+        if (!walletClient || !address) return;
+        setTxLoading(true);
+        try {
+            addEvent(`🛠️ Configuring protocol assets...`);
+            const tokens = [
+                { addr: CONTRACT_ADDRESSES.usdc, price: parseEther("1") },
+                { addr: CONTRACT_ADDRESSES.usdt, price: parseEther("1") },
+                { addr: CONTRACT_ADDRESSES.weth, price: parseEther("2000") },
+            ];
+
+            for (const t of tokens) {
+                if (!t.addr) continue;
+                addEvent(`🔗 Registering ${t.addr.slice(0, 8)}...`);
+                const hash = await walletClient.writeContract({
+                    address: CONTRACT_ADDRESSES.lendingMock,
+                    abi: LENDING_MOCK_ABI,
+                    functionName: "setSupportedToken",
+                    args: [t.addr as `0x${string}`, true, t.price],
+                } as any); // Use any here temporarily to bypass the transition ABI lag if it exists
+                await publicClient?.waitForTransactionReceipt({ hash });
+            }
+            addEvent(`✅ Protocol initialized successfully!`);
+            refreshAll();
+        } catch (e: any) {
+            console.error("Setup error:", e);
+            setError("Only protocol owner can initialize assets.");
+        } finally {
+            setTxLoading(false);
+        }
+    }, [walletClient, address, publicClient, refreshAll, addEvent]);
+
     return {
         position,
         allPositions,
@@ -685,6 +782,8 @@ export function useReactorX() {
         updatePrice,
         manualReact,
         registerSubscription,
+        checkIn,
+        setupProtocol,
         refreshAll,
     };
 }

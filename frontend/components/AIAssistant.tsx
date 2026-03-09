@@ -38,39 +38,52 @@ export default function AIAssistant() {
             </div>
 
             {isOpen && (
-                <div className="ai-panel card card-glass shadow-2xl">
-                    <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(139,92,246,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <h3 style={{ fontSize: 14, fontWeight: 800 }} className="gradient-text-purple">Navigator AI</h3>
-                        <span style={{ fontSize: 10, color: "var(--text-muted)" }}>ReactorX v1.0</span>
+                <div className="ai-panel card shadow-2xl animate-scale-in" style={{
+                    borderRadius: 32, background: "rgba(2,6,23,0.98)",
+                    border: "1px solid rgba(251,191,36,0.3)", width: 380, height: 500,
+                    display: "flex", flexDirection: "column"
+                }}>
+                    <div style={{
+                        padding: "24px", borderBottom: "1px solid rgba(251,191,36,0.15)",
+                        display: "flex", justifyContent: "space-between", alignItems: "center",
+                        background: "linear-gradient(to right, rgba(251,191,36,0.05), transparent)"
+                    }}>
+                        <div>
+                            <h3 style={{ fontSize: 16, fontWeight: 900, color: "var(--reactor-gold)" }}>NAVIGATOR AI</h3>
+                            <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700 }}>REACTORX INTEGRATED GUIDE</div>
+                        </div>
+                        <button onClick={() => setIsOpen(false)} style={{ background: "transparent", border: "none", color: "white", cursor: "pointer", fontSize: 18 }}>✕</button>
                     </div>
 
-                    <div className="ai-chat-body" ref={scrollRef}>
+                    <div className="ai-chat-body" ref={scrollRef} style={{ flex: 1, padding: 20 }}>
                         {messages.map((m, i) => (
-                            <div key={i} className={`ai-msg ${m.role === "bot" ? "ai-msg-bot" : "ai-msg-user"}`}>
+                            <div key={i} className={`ai-msg ${m.role === "bot" ? "ai-msg-bot" : "ai-msg-user"}`} style={{
+                                background: m.role === "bot" ? "rgba(255,255,255,0.05)" : "rgba(251,191,36,0.1)",
+                                border: `1px solid ${m.role === "bot" ? "rgba(251,191,36,0.1)" : "rgba(251,191,36,0.3)"}`,
+                                color: m.role === "bot" ? "var(--text-secondary)" : "#fff"
+                            }}>
                                 {m.content}
                             </div>
                         ))}
                     </div>
 
-                    <div style={{ padding: "16px", background: "rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: 8 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>Quick Questions:</div>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                            {PROTOCOL_KNOWLEDGE.map(k => (
+                    <div style={{ padding: "20px", background: "rgba(0,0,0,0.4)", borderTop: "1px solid rgba(251,191,36,0.1)" }}>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: "var(--reactor-gold)", marginBottom: 10 }}>QUICK COMMANDS:</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                            {PROTOCOL_KNOWLEDGE.slice(0, 3).map(k => (
                                 <button
                                     key={k.q}
                                     onClick={() => handleAsk(k.q)}
                                     style={{
-                                        background: "rgba(139,92,246,0.05)",
-                                        border: "1px solid rgba(139,92,246,0.1)",
-                                        borderRadius: "8px",
-                                        padding: "6px 10px",
-                                        fontSize: "11px",
-                                        color: "var(--text-secondary)",
+                                        background: "rgba(255,255,255,0.02)",
+                                        border: "1px solid rgba(255,255,255,0.1)",
+                                        borderRadius: "10px",
+                                        padding: "8px 12px",
+                                        fontSize: "12px",
+                                        color: "#fff",
                                         cursor: "pointer",
                                         transition: "all 0.2s"
                                     }}
-                                    onMouseOver={(e) => (e.currentTarget.style.borderColor = "var(--reactor-purple)")}
-                                    onMouseOut={(e) => (e.currentTarget.style.borderColor = "rgba(139,92,246,0.1)")}
                                 >
                                     {k.q}
                                 </button>

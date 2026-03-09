@@ -106,19 +106,21 @@ function WalletModal({ onClose }: { onClose: () => void }) {
         >
             <div
                 style={{
-                    background: "linear-gradient(145deg,rgba(20,8,0,0.98),rgba(10,4,0,0.99))",
-                    border: "1px solid rgba(234,88,12,0.35)",
-                    borderRadius: 24,
-                    padding: "32px 28px",
-                    width: "100%", maxWidth: 420,
-                    boxShadow: "0 40px 80px -10px rgba(0,0,0,0.9), 0 0 60px rgba(234,88,12,0.1)",
-                    animation: "scale-in 0.25s cubic-bezier(0.4,0,0.2,1)",
+                    background: "rgba(2,6,23,0.95)",
+                    border: "1px solid rgba(251,191,36,0.25)",
+                    borderRadius: 32,
+                    padding: "40px",
+                    width: "100%", maxWidth: 440,
+                    boxShadow: "0 40px 100px -20px rgba(0,0,0,0.8), 0 0 40px rgba(251,191,36,0.1)",
+                    animation: "scale-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
                     position: "relative",
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Top shimmer */}
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg,transparent,rgba(234,88,12,0.7),rgba(234,179,8,0.5),transparent)", borderRadius: "24px 24px 0 0" }} />
+                {/* Header Glow */}
+                <div style={{ position: "absolute", top: -100, left: -100, width: 300, height: 300, background: "radial-gradient(circle, rgba(251,191,36,0.1) 0%, transparent 70%)", opacity: 0.5, pointerEvents: "none" }} />
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg,transparent,rgba(251,191,36,0.6),transparent)", borderRadius: "32px 32px 0 0" }} />
 
                 {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
@@ -159,15 +161,15 @@ function WalletModal({ onClose }: { onClose: () => void }) {
                             >
                                 <span style={{ fontSize: 26, lineHeight: 1 }}>{w.icon}</span>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{w.name}</div>
-                                    <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{w.hint}</div>
+                                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text-primary)" }}>{w.name}</div>
+                                    <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{w.hint}</div>
                                 </div>
                                 {isConnecting ? (
                                     <span className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} />
                                 ) : isDetected ? (
-                                    <span style={{ fontSize: 10, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#34d399", borderRadius: 6, padding: "3px 8px", fontWeight: 700 }}>DETECTED</span>
+                                    <span style={{ fontSize: 10, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", color: "var(--reactor-gold)", borderRadius: 8, padding: "4px 10px", fontWeight: 800 }}>READY</span>
                                 ) : (
-                                    <span style={{ fontSize: 10, color: "var(--text-muted)", borderRadius: 6, padding: "3px 8px" }}>Not found</span>
+                                    <span style={{ fontSize: 10, color: "var(--text-muted)", opacity: 0.5 }}>Not detected</span>
                                 )}
                             </button>
                         );
@@ -263,24 +265,21 @@ export default function Header() {
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     <div
                         style={{
-                            position: "relative", width: 42, height: 42,
-                            borderRadius: 12,
-                            background: "linear-gradient(135deg, var(--reactor-purple), var(--reactor-cyan))",
+                            position: "relative", width: 44, height: 44,
+                            borderRadius: 14,
+                            background: "linear-gradient(135deg, var(--bg-primary), #0f172a)",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            boxShadow: "0 0 24px rgba(139,92,246,0.5), 0 0 60px rgba(6,182,212,0.1)",
+                            border: "1px solid rgba(251,191,36,0.3)",
+                            boxShadow: "0 0 20px rgba(251,191,36,0.15)",
                             flexShrink: 0,
                         }}
                     >
-                        <Image
+                        <img
                             src="/brand-logo.png"
                             alt="ReactorX"
-                            width={32}
-                            height={32}
-                            style={{ borderRadius: 6, objectFit: "contain" }}
-                            onError={(e) => { (e.target as HTMLImageElement).src = "/logo-new.png"; }}
-                            priority
+                            style={{ width: 34, height: 34, objectFit: "contain", filter: "drop-shadow(0 0 5px rgba(251,191,36,0.3))" }}
                         />
-                        <div style={{ position: "absolute", inset: -2, borderRadius: 14, border: "1px solid rgba(139,92,246,0.4)", pointerEvents: "none" }} />
+                        <div style={{ position: "absolute", inset: -1, borderRadius: 15, border: "1px solid rgba(251,191,36,0.4)", pointerEvents: "none" }} />
                     </div>
 
                     <div>
@@ -353,15 +352,15 @@ export default function Header() {
                                 onClick={handleCopy}
                                 title={copied ? "Copied!" : "Click to copy address"}
                                 style={{
-                                    background: "rgba(234,88,12,0.1)",
-                                    border: "1px solid rgba(234,88,12,0.3)",
-                                    borderRadius: 10, padding: "7px 14px",
+                                    background: "rgba(251,191,36,0.08)",
+                                    border: "1px solid rgba(251,191,36,0.3)",
+                                    borderRadius: 12, padding: "8px 16px",
                                     display: "flex", alignItems: "center", gap: 8,
                                     cursor: "pointer", transition: "all 0.2s",
                                 }}
                             >
-                                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981", display: "inline-block" }} />
-                                <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "#f97316" }}>
+                                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 10px #10b981", display: "inline-block" }} />
+                                <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 13, fontWeight: 700, color: "var(--reactor-gold)" }}>
                                     {address?.slice(0, 6)}…{address?.slice(-4)}
                                 </span>
                                 {copied && <span style={{ fontSize: 10, color: "#10b981" }}>✓</span>}

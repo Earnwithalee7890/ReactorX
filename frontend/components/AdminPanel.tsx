@@ -94,20 +94,40 @@ export default function AdminPanel({ stats, txLoading, address, onUpdatePrice, o
                 </div>
 
                 {/* Reactive Subscription Status */}
-                {stats && !stats.isSubscribed && (
-                    <div style={{ marginTop: 12, padding: 20, background: "rgba(234,179,8,0.05)", border: "1px solid rgba(234,179,8,0.2)", borderRadius: 12 }}>
+                {stats && (
+                    <div style={{ marginTop: 12, padding: 20, background: "rgba(251,191,36,0.05)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 12 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: "#fde047" }}>SUBSCRIPTION INACTIVE</div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: "var(--reactor-gold)" }}>PROTOCOL INITIALIZATION</div>
+                            <span className="dot-pulse green"></span>
+                        </div>
+                        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", marginBottom: 16 }}>
+                            Ensure all assets (USDC, USDT, WETH) are correctly registered as collateral providers.
+                        </p>
+                        <button
+                            className="btn-primary"
+                            onClick={() => (window as any).setupProtocol && (window as any).setupProtocol()}
+                            disabled={txLoading || !address}
+                            style={{ width: "100%", background: "var(--reactor-gold)", color: "black", fontWeight: 800 }}
+                        >
+                            {txLoading ? <span className="spinner" /> : "🛠️ INITIALIZE ASSETS"}
+                        </button>
+                    </div>
+                )}
+
+                {stats && !stats.isSubscribed && (
+                    <div style={{ marginTop: 12, padding: 20, background: "rgba(139,92,246,0.05)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 12 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: "var(--reactor-purple-light)" }}>SUBSCRIPTION INACTIVE</div>
                             <span className="dot-pulse yellow"></span>
                         </div>
-                        <p style={{ fontSize: 11, color: "rgba(253,224,71,0.7)", marginBottom: 16 }}>
+                        <p style={{ fontSize: 11, color: "rgba(139,92,246,0.7)", marginBottom: 16 }}>
                             ReactorEngine needs an active subscription to STT/USD price changes to work autonomously.
                         </p>
                         <button
                             className="btn-primary"
                             onClick={onRegisterSubscription}
                             disabled={txLoading || !address}
-                            style={{ width: "100%", background: "#f59e0b", color: "black", boxShadow: "0 0 20px rgba(245,158,11,0.2)" }}
+                            style={{ width: "100%", background: "var(--reactor-purple)", color: "white" }}
                         >
                             {txLoading ? <span className="spinner" /> : "REGISTER WITH PRECOMPILE"}
                         </button>

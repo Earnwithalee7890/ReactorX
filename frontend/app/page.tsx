@@ -27,18 +27,19 @@ export default function Home() {
     position, allPositions, liquidationHistory, stats,
     loading, txLoading, error, recentEvents,
     depositCollateral, borrow, repay, updatePrice, manualReact,
-    registerSubscription, refreshAll,
+    registerSubscription, checkIn, setupProtocol, refreshAll,
   } = useReactorX();
+
+  // Expose setupProtocol to window for the Admin button
+  if (typeof window !== "undefined") {
+    (window as any).setupProtocol = setupProtocol;
+  }
 
   return (
     <div style={{ minHeight: "100vh", position: "relative", backgroundColor: "var(--bg-primary)" }}>
       {/* ── Background System ── */}
-      <div className="bg-magma">
-        <div className="bg-grid" />
-        <div className="orb orb-1" />
-        <div className="orb orb-2" />
-        <div className="scan-line" />
-      </div>
+      <div className="bg-magma" />
+      <div className="bg-grid" />
 
       <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100vh" }}>
         <Header />
@@ -53,7 +54,7 @@ export default function Home() {
             {error && (
               <div style={{ marginBottom: 24 }} className="animate-scale-in">
                 <div style={{
-                  background: "var(--reactor-red-glow)", border: "1px solid var(--reactor-red)",
+                  background: "rgba(239,68,68,0.1)", border: "1px solid var(--reactor-red)",
                   borderRadius: 12, padding: "12px 18px", color: "white", fontSize: 13,
                   display: "flex", alignItems: "center", gap: 10,
                 }}>
@@ -66,31 +67,53 @@ export default function Home() {
             {tab === "dashboard" && (
               <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: 32 }}>
                 <div className="card card-glass" style={{
-                  padding: "40px",
+                  padding: "48px",
                   position: "relative",
                   overflow: "hidden",
-                  borderRadius: "24px",
-                  background: "linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,182,212,0.05))",
-                  border: "1px solid rgba(139,92,246,0.2)",
-                  boxShadow: "0 0 40px rgba(139,92,246,0.1)",
+                  borderRadius: "32px",
+                  background: "linear-gradient(135deg, rgba(2,6,23,0.8), rgba(30,41,59,0.4))",
+                  border: "1px solid rgba(251,191,36,0.15)",
+                  boxShadow: "0 0 60px rgba(0,0,0,0.4)",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center"
                 }}>
                   <div style={{ position: "relative", zIndex: 2 }}>
-                    <h1 style={{ fontSize: 42, fontWeight: 900, marginBottom: 12, letterSpacing: "-0.03em" }} className="gradient-text-purple">System Status: Active</h1>
-                    <p style={{ color: "var(--text-muted)", fontSize: 16, maxWidth: 500, lineHeight: 1.6 }}>
-                      Welcome back to the ReactorX Terminal. All autonomous liquidation systems are currently monitoring the Somnia Testnet liquidity pools.
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                      <span className="badge badge-cyan" style={{ border: "1px solid var(--reactor-gold)", color: "var(--reactor-gold)" }}>Verified Protocol</span>
+                      <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>SOMNIA SHANNON TESTNET</span>
+                    </div>
+                    <h1 style={{ fontSize: 48, fontWeight: 900, marginBottom: 16, letterSpacing: "-0.04em" }} className="gradient-text-purple">System Status: Active</h1>
+                    <p style={{ color: "var(--text-secondary)", fontSize: 18, maxWidth: 540, lineHeight: 1.6, marginBottom: 32 }}>
+                      Welcome to the ReactorX Terminal. Monitor liquidity, manage collateral, and engage autonomous liquidation systems with zero-latency.
                     </p>
-                    <div style={{ display: "flex", gap: 16, marginTop: 24 }}>
-                      <button className="btn-primary" onClick={() => setTab("faucet")} style={{ padding: "12px 24px" }}>💰 Daily Check-in</button>
-                      <button className="btn-secondary" onClick={() => refreshAll()} style={{ padding: "12px 24px" }}>↻ Sync Terminal</button>
+                    <div style={{ display: "flex", gap: 16 }}>
+                      <button
+                        className="btn-primary"
+                        onClick={async () => {
+                          try { await checkIn(); } catch (e) { }
+                        }}
+                        disabled={txLoading}
+                        style={{ padding: "18px 36px", fontSize: 16 }}
+                      >
+                        {txLoading ? "Checking in..." : "💰 Daily Check-in"}
+                      </button>
+                      <button className="btn-secondary" onClick={() => refreshAll()} style={{ padding: "18px 36px", fontSize: 16 }}>↻ Sync Terminal</button>
                     </div>
                   </div>
-                  <div style={{ position: "relative", width: 180, height: 180, opacity: 0.8 }} className="hide-mobile">
-                    <img src="/brand-logo.png" alt="ReactorX" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                  <div style={{ position: "relative", width: 220, height: 220, opacity: 0.9, zIndex: 1 }} className="hide-mobile">
+                    <img
+                      src="/brand-logo.png"
+                      alt="ReactorX"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        filter: "drop-shadow(0 0 30px rgba(251,191,36,0.4)) brightness(1.1)"
+                      }}
+                    />
                   </div>
-                  <div style={{ position: "absolute", top: -100, right: -100, width: 400, height: 400, background: "radial-gradient(circle, var(--reactor-purple) 0%, transparent 70%)", opacity: 0.15, pointerEvents: "none" }} />
+                  <div style={{ position: "absolute", top: -150, right: -150, width: 500, height: 500, background: "radial-gradient(circle, rgba(251,191,36,0.2) 0%, transparent 70%)", opacity: 0.3, pointerEvents: "none" }} />
                 </div>
 
                 <StatsRow stats={stats} />
