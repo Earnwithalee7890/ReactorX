@@ -36,3 +36,4 @@ feat: integrate real-time price feeds for assets 20260406-013603-552
 fix: resolve memory leak in background listeners 20260406-013604-003
 docs: add JSDoc comments to core utility functions 20260406-013604-443
 refactor: clean up legacy code in position card component 20260406-013604-916
+feat: add custom theme provider for dynamic styling 20260406-013605-371
