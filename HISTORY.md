@@ -85,3 +85,4 @@ refactor: modernize build process with Vite optimizations 20260406-013626-513
 feat: add detailed transaction history view 20260406-013626-965
 style: enhance readability of data tables 20260406-013627-421
 fix: resolve cross-browser styling inconsistencies 20260406-013627-893
+chore: upgrade to latest React version 20260406-013628-343
