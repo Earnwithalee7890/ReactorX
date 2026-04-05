@@ -20,3 +20,4 @@ refactor: modularize AI assistant logic 20260406-013556-163
 feat: implement lazy loading for position lists 20260406-013556-641
 fix: resolve hydration mismatch in Next.js components 20260406-013557-107
 style: update color palette for better contrast 20260406-013557-576
+chore: optimize bundle size for faster loading 20260406-013558-045
