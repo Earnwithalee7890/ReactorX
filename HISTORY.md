@@ -41,3 +41,4 @@ style: standardize button components across project 20260406-013605-834
 feat: implement basic caching for API requests 20260406-013606-302
 fix: correct typo in settings tab labels 20260406-013606-765
 docs: update deployment troubleshooting guide 20260406-013607-219
+refactor: decouple frontend from backend logic 20260406-013607-684
