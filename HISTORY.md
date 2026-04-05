@@ -50,3 +50,4 @@ feat: add user preference persistence in local storage 20260406-013610-143
 style: improve card layout for density and clarity 20260406-013610-620
 feat: implement automated testing for React components 20260406-013611-105
 fix: fix broken links in footer documentation 20260406-013611-580
+docs: add architectural overview diagram 20260406-013612-043
