@@ -34,3 +34,4 @@ refactor: optimize fetching logic for lending rates 20260406-013602-629
 style: improve spacing in settings layout 20260406-013603-088
 feat: integrate real-time price feeds for assets 20260406-013603-552
 fix: resolve memory leak in background listeners 20260406-013604-003
+docs: add JSDoc comments to core utility functions 20260406-013604-443
