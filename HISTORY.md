@@ -77,3 +77,4 @@ docs: update license information 20260406-013622-705
 refactor: optimize asset indexing for faster search 20260406-013623-171
 feat: add support for hardware wallet signatures 20260406-013623-774
 style: improve alignment of text elements in UI 20260406-013624-238
+fix: handle missing data states for lending cards 20260406-013624-688
