@@ -94,3 +94,4 @@ feat: add support for user-defined notification settings 20260406-013630-652
 style: improve dashboard layout on large screens 20260406-013631-105
 fix: fix calculation error for total portfolio value 20260406-013631-570
 feat: add tooltip explanations for technical terms 20260406-013632-023
+style: refresh icons for better visual appeal 20260406-013632-472
