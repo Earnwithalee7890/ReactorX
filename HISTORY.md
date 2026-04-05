@@ -96,3 +96,4 @@ fix: fix calculation error for total portfolio value 20260406-013631-570
 feat: add tooltip explanations for technical terms 20260406-013632-023
 style: refresh icons for better visual appeal 20260406-013632-472
 docs: add quick-start guide for new developers 20260406-013632-934
+refactor: consolidate styling into common CSS file 20260406-013633-393
