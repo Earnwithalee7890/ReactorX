@@ -74,3 +74,4 @@ chore: update project metadata and package description 20260406-013621-291
 feat: integrate with external blockchain explorers 20260406-013621-755
 style: add glowing effect to priority buttons 20260406-013622-237
 docs: update license information 20260406-013622-705
+refactor: optimize asset indexing for faster search 20260406-013623-171
