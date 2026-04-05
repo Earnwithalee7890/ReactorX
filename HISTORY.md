@@ -71,3 +71,4 @@ feat: add feedback form for user suggestions 20260406-013619-890
 style: improve typeface consistency across application 20260406-013620-380
 fix: resolve flickering issue during initial load 20260406-013620-838
 chore: update project metadata and package description 20260406-013621-291
+feat: integrate with external blockchain explorers 20260406-013621-755
