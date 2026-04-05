@@ -28,3 +28,4 @@ refactor: improve error boundary implementation 20260406-013559-905
 feat: add toast notifications for transaction success 20260406-013600-366
 style: enhance mobile responsiveness of the dashboard 20260406-013600-821
 fix: fix z-index issue in modal overlays 20260406-013601-280
+feat: add search functionality to asset list 20260406-013601-730
