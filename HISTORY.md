@@ -18,3 +18,4 @@ fix: handle API timeout errors gracefully 20260406-013555-105
 docs: add screenshots to technical documentation 20260406-013555-670
 refactor: modularize AI assistant logic 20260406-013556-163
 feat: implement lazy loading for position lists 20260406-013556-641
+fix: resolve hydration mismatch in Next.js components 20260406-013557-107
