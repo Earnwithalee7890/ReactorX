@@ -19,3 +19,4 @@ docs: add screenshots to technical documentation 20260406-013555-670
 refactor: modularize AI assistant logic 20260406-013556-163
 feat: implement lazy loading for position lists 20260406-013556-641
 fix: resolve hydration mismatch in Next.js components 20260406-013557-107
+style: update color palette for better contrast 20260406-013557-576
