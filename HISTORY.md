@@ -56,3 +56,4 @@ feat: add support for custom user avatars 20260406-013612-955
 style: enhance visual hierarchy in settings tab 20260406-013613-420
 fix: resolve issue with wallet connection persistency 20260406-013613-896
 chore: organize project directory structure 20260406-013614-343
+feat: implement advanced filtering for assets 20260406-013614-830
