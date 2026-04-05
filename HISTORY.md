@@ -72,3 +72,4 @@ style: improve typeface consistency across application 20260406-013620-380
 fix: resolve flickering issue during initial load 20260406-013620-838
 chore: update project metadata and package description 20260406-013621-291
 feat: integrate with external blockchain explorers 20260406-013621-755
+style: add glowing effect to priority buttons 20260406-013622-237
