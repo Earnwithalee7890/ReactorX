@@ -64,3 +64,4 @@ feat: add analytics tracking for user interactions 20260406-013616-670
 style: improve hover states for interactive elements 20260406-013617-121
 fix: fix bug in lending asset calculation logic 20260406-013617-580
 feat: add breadcrumb navigation for deep links 20260406-013618-034
+style: customize scrollbar appearance for internal lists 20260406-013618-481
