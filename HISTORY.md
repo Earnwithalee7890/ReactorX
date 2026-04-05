@@ -59,3 +59,4 @@ chore: organize project directory structure 20260406-013614-343
 feat: implement advanced filtering for assets 20260406-013614-830
 style: polish input fields with better borders and shadows 20260406-013615-293
 docs: rewrite README for better clarity 20260406-013615-781
+refactor: use functional components for all UI elements 20260406-013616-220
