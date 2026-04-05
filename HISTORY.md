@@ -91,3 +91,4 @@ style: optimize SVG icons for smaller payload 20260406-013629-279
 docs: add troubleshooting section for common errors 20260406-013629-743
 refactor: remove redundant state updates in frontend 20260406-013630-202
 feat: add support for user-defined notification settings 20260406-013630-652
+style: improve dashboard layout on large screens 20260406-013631-105
