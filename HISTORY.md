@@ -57,3 +57,4 @@ style: enhance visual hierarchy in settings tab 20260406-013613-420
 fix: resolve issue with wallet connection persistency 20260406-013613-896
 chore: organize project directory structure 20260406-013614-343
 feat: implement advanced filtering for assets 20260406-013614-830
+style: polish input fields with better borders and shadows 20260406-013615-293
