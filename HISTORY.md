@@ -61,3 +61,4 @@ style: polish input fields with better borders and shadows 20260406-013615-293
 docs: rewrite README for better clarity 20260406-013615-781
 refactor: use functional components for all UI elements 20260406-013616-220
 feat: add analytics tracking for user interactions 20260406-013616-670
+style: improve hover states for interactive elements 20260406-013617-121
