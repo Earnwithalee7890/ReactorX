@@ -44,3 +44,4 @@ docs: update deployment troubleshooting guide 20260406-013607-219
 refactor: decouple frontend from backend logic 20260406-013607-684
 feat: add support for multiple languages (i18n) 20260406-013608-156
 style: refine transition effects for AI assistant 20260406-013608-770
+fix: handle edge case for zero-balance accounts 20260406-013609-220
