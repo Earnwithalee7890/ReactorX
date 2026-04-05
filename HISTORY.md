@@ -11,3 +11,4 @@ style: add subtle animations to settings transitions 20260406-013551-772
 docs: document API response types 20260406-013552-251
 refactor: simplify hook logic in frontend components 20260406-013552-715
 feat: add real-time event listener for on-chain actions 20260406-013553-193
+fix: correction for decimal handling in lending assets 20260406-013553-663
