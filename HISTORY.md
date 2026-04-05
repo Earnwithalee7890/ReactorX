@@ -22,3 +22,4 @@ fix: resolve hydration mismatch in Next.js components 20260406-013557-107
 style: update color palette for better contrast 20260406-013557-576
 chore: optimize bundle size for faster loading 20260406-013558-045
 feat: add export functionality for user activity logs 20260406-013558-501
+fix: ensure consistent font rendering across browsers 20260406-013558-984
