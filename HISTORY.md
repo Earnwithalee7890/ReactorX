@@ -39,3 +39,4 @@ refactor: clean up legacy code in position card component 20260406-013604-916
 feat: add custom theme provider for dynamic styling 20260406-013605-371
 style: standardize button components across project 20260406-013605-834
 feat: implement basic caching for API requests 20260406-013606-302
+fix: correct typo in settings tab labels 20260406-013606-765
