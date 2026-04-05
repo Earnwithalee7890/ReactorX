@@ -82,3 +82,4 @@ feat: implement offline mode for basic UI functions 20260406-013625-143
 style: add subtle background patterns to layout 20260406-013625-602
 docs: improve code examples in internal guides 20260406-013626-052
 refactor: modernize build process with Vite optimizations 20260406-013626-513
+feat: add detailed transaction history view 20260406-013626-965
