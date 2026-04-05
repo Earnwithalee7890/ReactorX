@@ -8,3 +8,4 @@ fix: fix layout shift on page load 20260406-013550-366
 chore: update internal dependencies to latest versions 20260406-013550-834
 feat: implement AI-driven yield optimization suggestions 20260406-013551-305
 style: add subtle animations to settings transitions 20260406-013551-772
+docs: document API response types 20260406-013552-251
