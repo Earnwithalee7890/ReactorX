@@ -67,3 +67,4 @@ feat: add breadcrumb navigation for deep links 20260406-013618-034
 style: customize scrollbar appearance for internal lists 20260406-013618-481
 docs: add technical specs for the AI assistant module 20260406-013618-954
 refactor: simplify context providers to avoid nesting 20260406-013619-427
+feat: add feedback form for user suggestions 20260406-013619-890
