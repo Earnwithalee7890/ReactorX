@@ -30,3 +30,4 @@ style: enhance mobile responsiveness of the dashboard 20260406-013600-821
 fix: fix z-index issue in modal overlays 20260406-013601-280
 feat: add search functionality to asset list 20260406-013601-730
 chore: setup linting rules for TypeScript 20260406-013602-184
+refactor: optimize fetching logic for lending rates 20260406-013602-629
