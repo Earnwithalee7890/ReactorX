@@ -32,3 +32,4 @@ feat: add search functionality to asset list 20260406-013601-730
 chore: setup linting rules for TypeScript 20260406-013602-184
 refactor: optimize fetching logic for lending rates 20260406-013602-629
 style: improve spacing in settings layout 20260406-013603-088
+feat: integrate real-time price feeds for assets 20260406-013603-552
