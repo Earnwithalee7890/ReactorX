@@ -16,3 +16,4 @@ style: improve accessibility of navigation menu 20260406-013554-170
 feat: add dark mode support to frontend themes 20260406-013554-634
 fix: handle API timeout errors gracefully 20260406-013555-105
 docs: add screenshots to technical documentation 20260406-013555-670
+refactor: modularize AI assistant logic 20260406-013556-163
